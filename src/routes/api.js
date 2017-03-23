@@ -36,7 +36,7 @@ router.post('/setProxy', async(ctx, next) => {
     const requestData = ctx.request.body;
     await Setting.setProxy(requestData);
     ctx.body = {
-        "result": "success",
+        "result": "",
         "code": 200,
         "msg": "保存成功"
     }
@@ -55,7 +55,7 @@ router.post('/setInfo', async(ctx, next) => {
     const requestData = ctx.request.body;
     await ServiceInfo.setInfo(requestData);
     ctx.body = {
-        "result": "success",
+        "result": "",
         "code": 200,
         "msg": "设置成功"
     }
