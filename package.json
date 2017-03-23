@@ -1,7 +1,7 @@
 {
-  "name": "koa2-startkit",
-  "version": "0.2.0",
-  "author": "wssgcg1213",
+  "name": "ysfInterface",
+  "version": "0.0.1",
+  "author": "hzqingze",
   "scripts": {
     "start": "node bin/development.js",
     "production": "node bin/production.js",
@@ -52,7 +52,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/17koa/koa2-startkit.git"
+    "url": "git+https://github.com/NSFA/ysfInterface"
   },
   "license": "MIT"
 }
