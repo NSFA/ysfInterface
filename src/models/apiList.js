@@ -35,7 +35,6 @@ const getApiList = () => {
  */
 const delApi = (api) => {
     return new Promise((resolve, reject) => {
-        console.log(api)
         ApiList.remove({_id: api.id}).then((result) => {
             resolve({
                 code: 200,
@@ -53,7 +52,6 @@ const delApi = (api) => {
  */
 const getApi = (api) => {
     return new Promise((resolve, reject) => {
-        console.log(api)
         ApiList.findOne({_id: api.id}).then((result) => {
             resolve({
                 code: 200,
@@ -86,7 +84,8 @@ const addApi = (api) => {
                     ApiList.create(api).then((result) => {
                         resolve({
                             result: result,
-                            code: 200
+                            code: 200,
+                            msg:"创建API成功"
                         });
                     });
                 }
