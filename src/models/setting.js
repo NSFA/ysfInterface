@@ -14,7 +14,10 @@ const SettingSchema = new Schema({
 });
 const Setting = mongoose.model('Setting', SettingSchema);
 
-
+/**
+ * 获取AnyProxy
+ * @returns {Promise}
+ */
 const getProxy = () => {
     return new Promise((resolve, reject) => {
         Setting.findOne().then((result) => {
@@ -23,6 +26,11 @@ const getProxy = () => {
     });
 };
 
+/**
+ * 设置AnyProxy
+ * @param list
+ * @returns {Promise}
+ */
 const setProxy = (list) => {
     return new Promise((resolve, reject) => {
         Setting.updateOne(list).then((result) => {

@@ -12,7 +12,10 @@ const ServerInfoSchema = new Schema({
 });
 const ServerInfo = mongoose.model('ServerInfo', ServerInfoSchema);
 
-
+/**
+ * 获取服务器信息
+ * @returns {Promise}
+ */
 const getInfo = () => {
     return new Promise((resolve, reject) => {
         ServerInfo.findOne().then((result) => {
@@ -21,6 +24,11 @@ const getInfo = () => {
     });
 };
 
+/**
+ * 设置服务器信息
+ * @param status
+ * @returns {Promise}
+ */
 const setInfo = (status) => {
     return new Promise((resolve, reject) => {
         ServerInfo.updateOne(status).then((result) => {

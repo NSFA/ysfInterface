@@ -14,6 +14,11 @@ const UsersSchema = new Schema({
 
 const Users = mongoose.model('Users', UsersSchema);
 
+/**
+ * 简单的登录
+ * @param user
+ * @returns {Promise}
+ */
 const getUser = (user) => {
     return new Promise((resolve, reject) => {
         Users.findOne({'user':user}).then((result) => {
