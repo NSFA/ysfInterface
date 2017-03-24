@@ -1,3 +1,10 @@
+/**
+ * api接口
+ * Created by qingze
+ * User: hzqingze(hzqingze@corp.netease.com)
+ * Date: 2017/3/24
+ * Time: 下午4:49
+ **/
 import Router from 'koa-router'
 import User from '../models/user';
 import Setting from '../models/setting'

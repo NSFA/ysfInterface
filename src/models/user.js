@@ -1,4 +1,5 @@
 /**
+ * 用户表
  * Created by qingze
  * User: hzqingze(hzqingze@corp.netease.com)
  * Date: 2017/3/23
