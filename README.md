@@ -13,7 +13,6 @@ $ npm test # 单元测试
 $ npm run compile # 编译
 $ npm run production # 生产模式
 ```
-
 ## 线上部署
 
 ```bash
