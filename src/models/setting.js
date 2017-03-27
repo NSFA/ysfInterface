@@ -11,7 +11,7 @@ const SettingSchema = new Schema({
     port: {type: Number, required: true},
     anyproxy_port: {type: Number, required: true},
     ws_port: {type: Number, required: true},
-    url:{type:String,required:true},
+    url: {type: String, required: true},
     forceProxyHttps: {type: Boolean, required: true},
     throttle: {type: Number}
 });
@@ -36,6 +36,7 @@ const getProxy = () => {
  */
 const setProxy = (list) => {
     return new Promise((resolve, reject) => {
+        delete list._id;
         Setting.updateOne(list).then((result) => {
             resolve(result);
         });
