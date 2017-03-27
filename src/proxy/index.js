@@ -17,7 +17,8 @@ const getSetInfo = async () => {
         return {
             "url": path.join(proxySet.url, item.name),
             "json": item.json,
-            "status": item.status
+            "status": item.status,
+            "statusCode": item.statusCode
         }
     });
     const rule = {
@@ -27,6 +28,7 @@ const getSetInfo = async () => {
                 if (requestDetail.url.includes(item.url) && item.status) {
                     newRes.header['X-Proxy-By'] = 'YSF-MOCK';
                     newRes.body = JSON.stringify(item.json);
+                    newRes.statusCode = item.statusCode || 200;
                     return false;
                 }
             });

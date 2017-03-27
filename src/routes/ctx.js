@@ -8,6 +8,11 @@ const info = {
         "result": "",
         "code": 400,
         "msg": "登录失败"
+    },
+    "err8000": {
+        "result": "",
+        "code": 8000,
+        "msg": "请关闭服务器再进行操作"
     }
 };
 

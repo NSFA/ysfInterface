@@ -35,7 +35,7 @@ const setInfo = (status) => {
         ServerInfo.updateOne(status).then((result) => {
             resolve({
                 code: result.nModified ? 200 : 8000,
-                msg: result.nModified ? '设置成功' : '重复设置',
+                msg: result.nModified ? '设置成功' : '服务器状态改变，请刷新页面',
                 result: result
             });
         });

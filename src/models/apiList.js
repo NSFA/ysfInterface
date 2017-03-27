@@ -12,6 +12,7 @@ const ApiListSchema = new Schema({
     name: {type: String, required: true},
     status: {type: Boolean, required: true},
     json: {type: JSON, required: true},
+    statusCode:{type:Number,required:true},
     date: {type: Date, default: Date.now}
 });
 const ApiList = mongoose.model('ApiList', ApiListSchema);

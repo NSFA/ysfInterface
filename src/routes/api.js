@@ -51,6 +51,11 @@ router.get('/getProxy', async (ctx, next) => {
  * 设置AnyProxy
  */
 router.post('/setProxy', async (ctx, next) => {
+    const serverStatus = await ServiceInfo.getInfo();
+    if (serverStatus.status) {
+        ctx.body = jsonCtx.err8000;
+        return;
+    }
     const requestData = ctx.request.body;
     const settingRes = await Setting.setProxy(requestData);
     ctx.body = {
@@ -113,12 +118,17 @@ router.get('/getApiList', async (ctx, next) => {
  * 添加API项
  */
 router.post('/addApi', async (ctx, next) => {
+    const serverStatus = await ServiceInfo.getInfo();
+    if (serverStatus.status) {
+        ctx.body = jsonCtx.err8000;
+        return;
+    }
     const requestData = ctx.request.body;
     const info = await apiList.addApi(requestData);
     ctx.body = {
         "result": info.result || "",
         "code": info.code,
-        "msg": info.msg || "添加Api成功"
+        "msg": info.msg
     }
 });
 
@@ -126,6 +136,11 @@ router.post('/addApi', async (ctx, next) => {
  * 删除API项
  */
 router.post('/delApi', async (ctx, next) => {
+    const serverStatus = await ServiceInfo.getInfo();
+    if (serverStatus.status) {
+        ctx.body = jsonCtx.err8000;
+        return;
+    }
     const requestData = ctx.request.body;
     const info = await apiList.delApi(requestData);
     ctx.body = {
