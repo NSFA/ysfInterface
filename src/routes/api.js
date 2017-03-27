@@ -78,7 +78,7 @@ router.get('/getInfo', async (ctx, next) => {
  */
 router.post('/setInfo', async (ctx, next) => {
     const requestData = ctx.request.body;
-    if (global.serverStatus === requestData.proxy_switch) {
+    if (global.serverStatus === requestData.status) {
         ctx.body = jsonCtx.err8001;
         return;
     }
