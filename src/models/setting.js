@@ -36,8 +36,9 @@ const getProxy = () => {
  */
 const setProxy = (list) => {
     return new Promise((resolve, reject) => {
+        const id = list._id;
         delete list._id;
-        Setting.updateOne(list).then((result) => {
+        Setting.updateOne({_id: id}, list).then((result) => {
             resolve(result);
         });
     });
