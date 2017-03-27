@@ -8,13 +8,12 @@
 import Router from 'koa-router'
 import User from '../models/user';
 import Setting from '../models/setting'
-import ServiceInfo from '../models/serverInfo'
 import apiList from '../models/apiList'
 import proxySet from '../proxy'
 import AnyProxy from 'anyproxy'
 import jsonCtx from './ctx';
 const router = new Router();
-
+global.serverStatus = false;
 /**
  * 登录项
  */
@@ -51,8 +50,7 @@ router.get('/getProxy', async (ctx, next) => {
  * 设置AnyProxy
  */
 router.post('/setProxy', async (ctx, next) => {
-    const serverStatus = await ServiceInfo.getInfo();
-    if (serverStatus.status) {
+    if (global.serverStatus) {
         ctx.body = jsonCtx.err8000;
         return;
     }
@@ -69,14 +67,8 @@ router.post('/setProxy', async (ctx, next) => {
  * 获取服务器信息
  */
 router.get('/getInfo', async (ctx, next) => {
-    const info = await ServiceInfo.getInfo();
-    if (info.status && !global.proxySvr) {
-        const options = await proxySet.getSetInfo();
-        global.proxySvr = new AnyProxy.ProxyServer(options);
-        global.proxySvr.start();
-    }
     ctx.body = {
-        "result": {proxy_switch: info.status},
+        "result": {proxy_switch: global.serverStatus},
         "code": 200,
         "msg": "success"
     }
@@ -87,19 +79,19 @@ router.get('/getInfo', async (ctx, next) => {
  */
 router.post('/setInfo', async (ctx, next) => {
     const requestData = ctx.request.body;
-    const setRes = await ServiceInfo.setInfo(requestData);
-    const serverStatus = await ServiceInfo.getInfo();
-    if (setRes.code === 200) {
-        const options = await proxySet.getSetInfo();
-        if (serverStatus.status) {
+    if (global.serverStatus === requestData.proxy_switch) {
+        ctx.body = jsonCtx.err8001;
+    } else {
+        global.serverStatus = !global.serverStatus;
+        if (global.serverStatus) {
+            const options = await proxySet.getSetInfo();
             global.proxySvr = new AnyProxy.ProxyServer(options);
             global.proxySvr.start();
         } else {
             global.proxySvr.close();
-            global.proxySvr = null;
         }
+        ctx.body = jsonCtx.setSuccess;
     }
-    ctx.body = setRes
 });
 
 /**
@@ -118,8 +110,7 @@ router.get('/getApiList', async (ctx, next) => {
  * 添加API项
  */
 router.post('/addApi', async (ctx, next) => {
-    const serverStatus = await ServiceInfo.getInfo();
-    if (serverStatus.status) {
+    if (global.serverStatus) {
         ctx.body = jsonCtx.err8000;
         return;
     }
@@ -136,8 +127,7 @@ router.post('/addApi', async (ctx, next) => {
  * 删除API项
  */
 router.post('/delApi', async (ctx, next) => {
-    const serverStatus = await ServiceInfo.getInfo();
-    if (serverStatus.status) {
+    if (global.serverStatus) {
         ctx.body = jsonCtx.err8000;
         return;
     }
