@@ -1,6 +1,6 @@
 {
   "apps": [{
-    "name": "koa2-startkit",
+    "name": "ysf-mock",
     "script": "bin/production.js",
     // "cwd": "/absolute/path/to/project",
     "exec_mode": "cluster",
