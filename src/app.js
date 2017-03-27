@@ -8,7 +8,7 @@ import Bodyparser from 'koa-bodyparser'
 import logger from 'koa-logger'
 import koaStatic from 'koa-static-plus'
 import koaOnError from 'koa-onerror'
-import config from './config'
+import config from './config/default'
 
 const app = new Koa()
 const bodyparser = Bodyparser()
