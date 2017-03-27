@@ -13,9 +13,6 @@ import proxySet from '../proxy'
 import AnyProxy from 'anyproxy'
 import jsonCtx from './ctx';
 const router = new Router();
-
-global.serverStatus = false;
-
 /**
  * 登录项
  */
