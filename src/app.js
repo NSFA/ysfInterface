@@ -8,7 +8,7 @@ import Bodyparser from 'koa-bodyparser'
 import logger from 'koa-logger'
 import koaStatic from 'koa-static-plus'
 import koaOnError from 'koa-onerror'
-import config from './config/default'
+import config from './config'
 
 const app = new Koa()
 const bodyparser = Bodyparser()
@@ -56,7 +56,6 @@ app.use(async (ctx) => {
 app.on('error', async (err, ctx) => {
   console.log('error occured:', err)
 })
-
 const port = parseInt(config.port || '3000')
 const server = http.createServer(app.callback())
 
