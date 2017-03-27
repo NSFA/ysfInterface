@@ -24,8 +24,10 @@ const getSetInfo = async () => {
     const rule = {
         async beforeSendResponse(requestDetail, responseDetail) {
             let newRes = responseDetail.response;
+            const urlReg = /(\w+):\/\/(([^\:|\/]+)(\:\d*)?(.*\/)([^#|\?|\n]+))?(#.*)?(\?.*)?/i;
+            const formerUrl = urlReg.exec(requestDetail.url)[2];
             _.forEach(apiMap, function (item) {
-                if (requestDetail.url.includes(item.url) && item.status) {
+                if (formerUrl === item.url && item.status) {
                     newRes.header['X-Proxy-By'] = 'YSF-MOCK';
                     newRes.body = JSON.stringify(item.json);
                     newRes.statusCode = item.statusCode || 200;
