@@ -18,7 +18,7 @@ const router = new Router();
 /**
  * 登录项
  */
-router.post('/login', async(ctx, next) => {
+router.post('/login', async (ctx, next) => {
     const requestData = ctx.request.body;
     const info = await User.getUser(requestData.account);
     if (info && info.password === requestData.password) {
@@ -38,7 +38,7 @@ router.post('/login', async(ctx, next) => {
 /**
  * 获取AnyProxy设置
  */
-router.get('/getProxy', async(ctx, next) => {
+router.get('/getProxy', async (ctx, next) => {
     const result = await Setting.getProxy();
     ctx.body = {
         "result": result,
@@ -50,20 +50,20 @@ router.get('/getProxy', async(ctx, next) => {
 /**
  * 设置AnyProxy
  */
-router.post('/setProxy', async(ctx, next) => {
+router.post('/setProxy', async (ctx, next) => {
     const requestData = ctx.request.body;
-    await Setting.setProxy(requestData);
+    const settingRes = await Setting.setProxy(requestData);
     ctx.body = {
-        "result": "",
-        "code": 200,
-        "msg": "保存成功"
+        "result": settingRes,
+        "code": settingRes.ok === 1 ? 200 : 8000,
+        "msg": settingRes.ok === 1 ? "保存成功" : "保存失败"
     }
 });
 
 /**
  * 获取服务器信息
  */
-router.get('/getInfo', async(ctx, next) => {
+router.get('/getInfo', async (ctx, next) => {
     const info = await ServiceInfo.getInfo();
     if (info.status && !global.proxySvr) {
         const options = await proxySet.getSetInfo();
@@ -80,41 +80,39 @@ router.get('/getInfo', async(ctx, next) => {
 /**
  * 设置服务器信息
  */
-router.post('/setInfo', async(ctx, next) => {
+router.post('/setInfo', async (ctx, next) => {
     const requestData = ctx.request.body;
-    await ServiceInfo.setInfo(requestData);
-    const options = await proxySet.getSetInfo();
+    const setRes = await ServiceInfo.setInfo(requestData);
     const serverStatus = await ServiceInfo.getInfo();
-    if (serverStatus.status) {
-        global.proxySvr = new AnyProxy.ProxyServer(options);
-        global.proxySvr.start();
-    } else {
-        global.proxySvr.close();
-        global.proxySvr = null;
+    if (setRes.code === 200) {
+        const options = await proxySet.getSetInfo();
+        if (serverStatus.status) {
+            global.proxySvr = new AnyProxy.ProxyServer(options);
+            global.proxySvr.start();
+        } else {
+            global.proxySvr.close();
+            global.proxySvr = null;
+        }
     }
-    ctx.body = {
-        "result": "",
-        "code": 200,
-        "msg": "服务设置成功"
-    }
+    ctx.body = setRes
 });
 
 /**
  * 获取API列表
  */
-router.get('/getApiList', async(ctx, next) => {
+router.get('/getApiList', async (ctx, next) => {
     const list = await apiList.getApiList();
     ctx.body = {
         "result": list,
         "code": 200,
-        "msg": "列表在这里"
+        "msg": "Api列表在这里"
     }
 });
 
 /**
  * 添加API项
  */
-router.post('/addApi', async(ctx, next) => {
+router.post('/addApi', async (ctx, next) => {
     const requestData = ctx.request.body;
     const info = await apiList.addApi(requestData);
     ctx.body = {
@@ -127,7 +125,7 @@ router.post('/addApi', async(ctx, next) => {
 /**
  * 删除API项
  */
-router.post('/delApi', async(ctx, next) => {
+router.post('/delApi', async (ctx, next) => {
     const requestData = ctx.request.body;
     const info = await apiList.delApi(requestData);
     ctx.body = {
@@ -140,7 +138,7 @@ router.post('/delApi', async(ctx, next) => {
 /**
  * 获取API项
  */
-router.get('/getApi', async(ctx, next) => {
+router.get('/getApi', async (ctx, next) => {
     const requestData = ctx.request.query;
     const info = await apiList.getApi(requestData);
     ctx.body = {

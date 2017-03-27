@@ -22,7 +22,7 @@ const ApiList = mongoose.model('ApiList', ApiListSchema);
  */
 const getApiList = () => {
     return new Promise((resolve, reject) => {
-        ApiList.find().then((result) => {
+        ApiList.find().sort({"name":-1}).then((result) => {
             resolve(result);
         });
     });

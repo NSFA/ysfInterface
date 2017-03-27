@@ -8,24 +8,32 @@
 import setting from '../models/setting'
 import apiList from '../models/apiList'
 import _ from 'lodash';
+import path from 'path';
 
-const getSetInfo = async() => {
+const getSetInfo = async () => {
     const proxySet = await setting.getProxy();
     const apiSet = await apiList.getApiList();
     const apiMap = _.map(apiSet, (item) => {
-        return item.name;
+        return {
+            "url": path.join(proxySet.url, item.name),
+            "json": item.json,
+            "status": item.status
+        }
     });
     const rule = {
-        // *beforeSendRequest(requestDetail) {
-        //     if (requestDetail.url.indexOf('http://httpbin.org') === 0) {
-        //         const newRequestOptions = requestDetail.requestOptions;
-        //         newRequestOptions.path = '/user-agent';
-        //         newRequestOptions.method = 'GET';
-        //         return {
-        //             requestOptions: newRequestOptions
-        //         };
-        //     }
-        // },
+        async beforeSendResponse(requestDetail, responseDetail) {
+            let newRes = responseDetail.response;
+            _.forEach(apiMap, function (item) {
+                if (requestDetail.url.includes(item.url) && item.status) {
+                    newRes.header['X-Proxy-By'] = 'YSF-MOCK';
+                    newRes.body = JSON.stringify(item.json);
+                    return false;
+                }
+            });
+            return {
+                response: newRes
+            }
+        },
     };
     return {
         port: proxySet.port,
@@ -33,7 +41,7 @@ const getSetInfo = async() => {
         webInterface: {
             enable: true,
             webPort: proxySet.anyproxy_port,
-            wsPort: 8003,
+            wsPort: proxySet.ws_port,
         },
         throttle: proxySet.throttle || '',
         forceProxyHttps: proxySet.forceProxyHttps,

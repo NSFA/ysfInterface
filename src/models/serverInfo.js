@@ -33,12 +33,16 @@ const getInfo = () => {
 const setInfo = (status) => {
     return new Promise((resolve, reject) => {
         ServerInfo.updateOne(status).then((result) => {
-            resolve(result);
+            resolve({
+                code: result.nModified ? 200 : 8000,
+                msg: result.nModified ? '设置成功' : '重复设置',
+                result: result
+            });
         });
     });
 };
 
 
 export default {
-    getInfo,setInfo
+    getInfo, setInfo
 }

@@ -10,6 +10,8 @@ const Schema = mongoose.Schema;
 const SettingSchema = new Schema({
     port: {type: Number, required: true},
     anyproxy_port: {type: Number, required: true},
+    ws_port: {type: Number, required: true},
+    url:{type:String,required:true},
     forceProxyHttps: {type: Boolean, required: true},
     throttle: {type: Number}
 });
