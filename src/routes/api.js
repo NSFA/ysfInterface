@@ -13,7 +13,9 @@ import proxySet from '../proxy'
 import AnyProxy from 'anyproxy'
 import jsonCtx from './ctx';
 const router = new Router();
+
 global.serverStatus = false;
+
 /**
  * 登录项
  */
@@ -81,17 +83,17 @@ router.post('/setInfo', async (ctx, next) => {
     const requestData = ctx.request.body;
     if (global.serverStatus === requestData.proxy_switch) {
         ctx.body = jsonCtx.err8001;
-    } else {
-        global.serverStatus = !global.serverStatus;
-        if (global.serverStatus) {
-            const options = await proxySet.getSetInfo();
-            global.proxySvr = new AnyProxy.ProxyServer(options);
-            global.proxySvr.start();
-        } else {
-            global.proxySvr.close();
-        }
-        ctx.body = jsonCtx.setSuccess;
+        return;
     }
+    global.serverStatus = !global.serverStatus;
+    if (global.serverStatus) {
+        const options = await proxySet.getSetInfo();
+        global.proxySvr = new AnyProxy.ProxyServer(options);
+        global.proxySvr.start();
+    } else {
+        global.proxySvr.close();
+    }
+    ctx.body = jsonCtx.setSuccess;
 });
 
 /**
