@@ -9,18 +9,57 @@ import setting from '../models/setting'
 import apiList from '../models/apiList'
 import _ from 'lodash';
 import path from 'path';
+import apiEmiiter from './emmiter';
 
 const getSetInfo = async () => {
     const proxySet = await setting.getProxy();
     const apiSet = await apiList.getApiList();
-    const apiMap = _.map(apiSet, (item) => {
+    let apiMap = _.map(apiSet, (item) => {
         return {
             "url": path.join(proxySet.url, item.name),
             "json": item.json,
             "status": item.status,
-            "statusCode": item.statusCode
+            "statusCode": item.statusCode,
+            "id": item._id
         }
     });
+    /**
+     * Api添加
+     */
+    apiEmiiter.on('apilistadd', function (result) {
+        apiMap.push({
+            "url": path.join(proxySet.url, result.name),
+            "json": result.json,
+            "status": result.status,
+            "statusCode": result.statusCode,
+            "id": result._id
+        });
+    });
+    /**
+     * Api编辑
+     */
+    apiEmiiter.on('apilistedit', function (result) {
+        apiMap = _.forEach(apiMap, function (item) {
+            if (item.id == result.id) {
+                _.extend(item, {
+                    "url": path.join(proxySet.url, result.name),
+                    "json": result.json,
+                    "status": result.status,
+                    "statusCode": result.statusCode,
+                });
+                return false;
+            }
+        });
+    });
+    /**
+     * Api删除
+     */
+    apiEmiiter.on('apilistdel', function (id) {
+        apiMap = _.filter(apiMap, function (item) {
+            return item.id != id
+        });
+    });
+
     const rule = {
         async beforeSendResponse(requestDetail, responseDetail) {
             let newRes = responseDetail.response;

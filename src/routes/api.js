@@ -12,6 +12,7 @@ import apiList from '../models/apiList'
 import proxySet from '../proxy'
 import AnyProxy from 'anyproxy'
 import jsonCtx from './ctx';
+import apiEmiiter from '../proxy/emmiter';
 const router = new Router();
 /**
  * 登录项
@@ -109,12 +110,15 @@ router.get('/getApiList', async (ctx, next) => {
  * 添加API项
  */
 router.post('/addApi', async (ctx, next) => {
-    if (global.serverStatus) {
-        ctx.body = jsonCtx.err8000;
-        return;
-    }
     const requestData = ctx.request.body;
     const info = await apiList.addApi(requestData);
+    if (info.code === 200) {
+        if (requestData.id === -1) {
+            apiEmiiter.emit('apilistadd', info.result);
+        } else {
+            apiEmiiter.emit('apilistedit', requestData);
+        }
+    }
     ctx.body = {
         "result": info.result || "",
         "code": info.code,
@@ -126,12 +130,9 @@ router.post('/addApi', async (ctx, next) => {
  * 删除API项
  */
 router.post('/delApi', async (ctx, next) => {
-    if (global.serverStatus) {
-        ctx.body = jsonCtx.err8000;
-        return;
-    }
     const requestData = ctx.request.body;
     const info = await apiList.delApi(requestData);
+    info.code === 200 && apiEmiiter.emit('apilistdel', requestData.id);
     ctx.body = {
         "result": info.result || "",
         "code": info.code,
