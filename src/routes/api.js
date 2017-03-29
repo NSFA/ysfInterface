@@ -9,8 +9,6 @@ import Router from 'koa-router'
 import User from '../models/user';
 import Setting from '../models/setting'
 import apiList from '../models/apiList'
-import proxySet from '../proxy'
-import AnyProxy from 'anyproxy'
 import jsonCtx from './ctx';
 import apiEmiiter from '../proxy/emmiter';
 const router = new Router();
@@ -50,48 +48,14 @@ router.get('/getProxy', async (ctx, next) => {
  * 设置AnyProxy
  */
 router.post('/setProxy', async (ctx, next) => {
-    if (global.serverStatus) {
-        ctx.body = jsonCtx.err8000;
-        return;
-    }
     const requestData = ctx.request.body;
     const settingRes = await Setting.setProxy(requestData);
+    settingRes.ok === 1 && apiEmiiter.emit('urlchange', requestData.url);
     ctx.body = {
         "result": settingRes,
         "code": settingRes.ok === 1 ? 200 : 8000,
         "msg": settingRes.ok === 1 ? "保存成功" : "保存失败"
     }
-});
-
-/**
- * 获取服务器信息
- */
-router.get('/getInfo', async (ctx, next) => {
-    ctx.body = {
-        "result": {proxy_switch: global.serverStatus},
-        "code": 200,
-        "msg": "success"
-    }
-});
-
-/**
- * 设置服务器信息
- */
-router.post('/setInfo', async (ctx, next) => {
-    const requestData = ctx.request.body;
-    if (global.serverStatus === requestData.status) {
-        ctx.body = jsonCtx.err8001;
-        return;
-    }
-    global.serverStatus = !global.serverStatus;
-    if (global.serverStatus) {
-        const options = await proxySet.getSetInfo();
-        global.proxySvr = new AnyProxy.ProxyServer(options);
-        global.proxySvr.start();
-    } else {
-        global.proxySvr.close();
-    }
-    ctx.body = jsonCtx.setSuccess;
 });
 
 /**

@@ -10,6 +10,7 @@ import apiList from '../models/apiList'
 import _ from 'lodash';
 import path from 'path';
 import apiEmiiter from './emmiter';
+import AnyProxy from 'anyproxy'
 
 const getSetInfo = async () => {
     const proxySet = await setting.getProxy();
@@ -20,7 +21,8 @@ const getSetInfo = async () => {
             "json": item.json,
             "status": item.status,
             "statusCode": item.statusCode,
-            "id": item._id
+            "id": item._id,
+            "name": item.name
         }
     });
     /**
@@ -32,7 +34,8 @@ const getSetInfo = async () => {
             "json": result.json,
             "status": result.status,
             "statusCode": result.statusCode,
-            "id": result._id
+            "id": result._id,
+            "name": result.name
         });
     });
     /**
@@ -46,6 +49,7 @@ const getSetInfo = async () => {
                     "json": result.json,
                     "status": result.status,
                     "statusCode": result.statusCode,
+                    "name": result.name
                 });
                 return false;
             }
@@ -59,7 +63,14 @@ const getSetInfo = async () => {
             return item.id != id
         });
     });
-
+    /**
+     * 拦截url改变
+     */
+    apiEmiiter.on('urlchange', function (url) {
+        apiMap = _.forEach(apiMap, (item) => {
+            item.url = path.join(url, item.name)
+        });
+    });
     const rule = {
         async beforeSendResponse(requestDetail, responseDetail) {
             let newRes = responseDetail.response;
@@ -67,7 +78,7 @@ const getSetInfo = async () => {
             const formerUrl = urlReg.exec(requestDetail.url)[2];
             _.forEach(apiMap, function (item) {
                 if (formerUrl === item.url && item.status) {
-                    newRes.header['X-Proxy-By'] = 'YSF-MOCK';
+                    newRes.header['X-Proxy-By'] = 'YSF-MOCK-RES';
                     newRes.body = JSON.stringify(item.json);
                     newRes.statusCode = item.statusCode || 200;
                     return false;
@@ -92,6 +103,15 @@ const getSetInfo = async () => {
     };
 };
 
+async function openAnyProxy() {
+    const options = await getSetInfo();
+    const proxySvr = new AnyProxy.ProxyServer(options);
+    proxySvr.on('ready', () => {
+        console.log("AnyProxy Server ready")
+    });
+    proxySvr.start();
+}
+
 export default {
-    getSetInfo
+    openAnyProxy
 }
