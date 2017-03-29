@@ -162,7 +162,6 @@ const getSetInfo = async () => {
                                 requestOptions: newOption
                             }
                         } else {
-                            console.log(reqForm);
                             return {
                                 requestData: reqForm
                             }
