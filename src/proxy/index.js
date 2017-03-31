@@ -132,8 +132,6 @@ const getSetInfo = async () => {
 	});
 	
 	
-	let parse
-	
 	// --------------------------------------  rule  -------------------------------------- //
 	const rule = {
 		async beforeSendRequest(requestDetail) {
