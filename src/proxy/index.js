@@ -154,18 +154,18 @@ const getSetInfo = async () => {
 			 * @param reqData
 			 * @returns {string}
 			 */
-			let mergeRequestBody = function(urlParams, reqData){
-				let params = JSON.parse('{"' + decodeURI(urlParams).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+			let mergeRequestBody = function (urlParams, reqData) {
+				let params = JSON.parse('{"' + decodeURI(urlParams).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
 				let ret = {};
 				for (let i in reqData) {
 					if (reqData.hasOwnProperty(i)) {
-						ret[reqData[i].key] =  reqData[i].value;
+						ret[reqData[i].key] = reqData[i].value;
 					}
 				}
 				
 				let merge = Object.assign({}, params, ret);
 				
-				return Object.keys(merge).map(function(k){
+				return Object.keys(merge).map(function (k) {
 					return encodeURI(k) + '=' + encodeURI(merge[k]);
 				}).join('&')
 				
@@ -173,14 +173,16 @@ const getSetInfo = async () => {
 			}
 			
 			
-			
 			if (reqData) {
 				switch (reqType) {
+					// application/json
 					case 1:
 						return {
 							requestData: JSON.stringify(reqData)
 						};
 						break;
+					
+					// multipart/form-data
 					case 2:
 						let reqForm = "";
 						if (requestDetail.requestOptions.method === 'GET') {
@@ -200,6 +202,8 @@ const getSetInfo = async () => {
 							}
 						}
 						break;
+					
+					// other
 					case 3:
 						return {
 							requestData: reqForm
