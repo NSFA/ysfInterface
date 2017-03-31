@@ -136,9 +136,12 @@ const getSetInfo = async () => {
 	const rule = {
 		async beforeSendRequest(requestDetail) {
 			const reqUrl = urlReg.exec(requestDetail.url)[2];
+			const hostname = requestDetail.requestOptions.hostname;
+			const proxyUrl = proxySet.url; // 区分二级域名
+			
 			let reqData, reqType;
 			_.forEach(apiReqMap, function (item) {
-				if (reqUrl === item.url && item.status) {
+				if (hostname.indexOf(proxyUrl) > -1 && item.status) {
 					reqData = item.reqData;
 					reqType = item.type;
 					return false;
