@@ -1,7 +1,7 @@
 /**
  * AnyProxy
  * Created by qingze
- * User: hzqingze(hzqingze@corp.netease.com)
+ * User: hzqingze
  * Date: 2017/3/23
  * Time: 下午6:28
  **/
