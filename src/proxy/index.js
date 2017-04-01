@@ -15,14 +15,14 @@ import AnyProxy from 'anyproxy'
 
 
 const getSetInfo = async () => {
-	
+
 	const proxySet = await setting.getProxy();
 	const apiSet = await apiList.getApiList();
 	const apiReqSet = await apiReqList.getReqApiList();
 	const urlReg = /(\w+):\/\/(([^\:|\/]+)(\:\d*)?(.*\/)([^#|\?|\n]+))?(#.*)?(\?.*)?/i;
 	// --------------------------------------  事件监听  -------------------------------------- //
-	
-	
+
+
 	/**
 	 * 响应Api表
 	 */
@@ -133,8 +133,8 @@ const getSetInfo = async () => {
 			item.url = path.join(url, item.name)
 		});
 	});
-	
-	
+
+
 	// --------------------------------------  rule  -------------------------------------- //
 	const rule = {
 		async beforeSendRequest(requestDetail) {
@@ -143,8 +143,8 @@ const getSetInfo = async () => {
 			const proxyUrl = proxySet.url; // 区分二级域名
 			const path = requestDetail.requestOptions.path.split('?')[0];
 			let reqData, reqType;
-			
-			
+
+
 			_.forEach(apiReqMap, function (item) {
 				if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
 					reqData = item.reqData;
@@ -152,7 +152,7 @@ const getSetInfo = async () => {
 					return false;
 				}
 			});
-			
+
 			/**
 			 * 合并请求头
 			 * @param urlParams
@@ -160,11 +160,11 @@ const getSetInfo = async () => {
 			 * @returns {string}
 			 */
 			let mergeRequestBody = function (urlParams, reqData) {
-				if(!urlParams){
+				if (!urlParams) {
 					return '';
 				}
-				
-				
+
+
 				let params = JSON.parse('{"' + decodeURI(urlParams).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
 				let ret = {};
 				for (let i in reqData) {
@@ -172,17 +172,17 @@ const getSetInfo = async () => {
 						ret[reqData[i].key] = reqData[i].value;
 					}
 				}
-				
+
 				let merge = Object.assign({}, params, ret);
-				
+
 				return Object.keys(merge).map(function (k) {
 					return encodeURI(k) + '=' + encodeURI(merge[k]);
 				}).join('&')
-				
-				
+
+
 			}
-			
-			
+
+
 			if (reqData) {
 				switch (reqType) {
 					// application/json
@@ -191,28 +191,28 @@ const getSetInfo = async () => {
 							requestData: JSON.stringify(reqData)
 						};
 						break;
-					
+
 					// multipart/form-data
 					case 2:
 						let reqForm = "";
 						if (requestDetail.requestOptions.method === 'GET') {
 							const newOption = Object.assign({}, requestDetail.requestOptions);
 							reqForm = mergeRequestBody(requestDetail.requestOptions.path.split('?')[1], reqData);
-							
+
 							newOption.path = `${requestDetail.requestOptions.path.split('?')[0]}?${reqForm}`;
 							return {
 								requestOptions: newOption
 							}
 						} else {
-							
+
 							reqForm = mergeRequestBody(requestDetail.requestData, reqData);
-							
+
 							return {
 								requestData: reqForm
 							}
 						}
 						break;
-					
+
 					// other
 					case 3:
 						return {
@@ -228,9 +228,15 @@ const getSetInfo = async () => {
 		},
 		async beforeSendResponse(requestDetail, responseDetail) {
 			let newRes = responseDetail.response;
-			const formerUrl = urlReg.exec(requestDetail.url)[2];
+
+			const reqUrl = urlReg.exec(requestDetail.url)[2];
+			const hostname = requestDetail.requestOptions.hostname;
+			const proxyUrl = proxySet.url; // 区分二级域名
+			const path = requestDetail.requestOptions.path.split('?')[0];
+
+			
 			_.forEach(apiMap, function (item) {
-				if (formerUrl === item.url && item.status) {
+				if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
 					newRes.header['X-Proxy-By'] = 'YSF-MOCK';
 					newRes.body = JSON.stringify(item.json);
 					newRes.statusCode = item.statusCode || 200;
@@ -255,6 +261,8 @@ const getSetInfo = async () => {
 		silent: false
 	};
 };
+
+
 // --------------------------------------  开启代理服务  -------------------------------------- //
 async function openAnyProxy() {
 	const options = await getSetInfo();
