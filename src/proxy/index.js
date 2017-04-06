@@ -159,7 +159,7 @@ const getSetInfo = async () => {
 			 * @param reqData
 			 * @returns {string}
 			 */
-			let mergeRequestBody = function (urlParams, reqData) {
+			const mergeRequestBody = function (urlParams, reqData) {
 				if (!urlParams) {
 					return '';
 				}
@@ -183,16 +183,26 @@ const getSetInfo = async () => {
 			}
 
 
+
 			if (reqData) {
 				switch (reqType) {
 					// application/json
 					case 1:
-						return {
-							requestData: JSON.stringify(reqData)
-						};
+						try{
+							let ret = _.defaultsDeep({}, eval('('+ requestDetail.requestData.toString() + ')'), reqData);
+							return {
+								requestData : JSON.stringify(ret)
+							}
+						}catch(err){
+							console.log('blue '.blue,  reqData);
+							return {
+								requestData: JSON.stringify(reqData)
+							};
+						}
+
 						break;
 
-					// multipart/form-data
+					// application/x-www-form-urlencoded
 					case 2:
 						let reqForm = "";
 						if (requestDetail.requestOptions.method === 'GET') {
