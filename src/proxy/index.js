@@ -194,12 +194,10 @@ const getSetInfo = async () => {
 								requestData : JSON.stringify(ret)
 							}
 						}catch(err){
-							console.log('blue '.blue,  reqData);
 							return {
 								requestData: JSON.stringify(reqData)
 							};
 						}
-
 						break;
 
 					// application/x-www-form-urlencoded
