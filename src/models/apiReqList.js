@@ -11,7 +11,9 @@ const Schema = mongoose.Schema;
 const ApiReqListSchema = new Schema({
     name: {type: String, required: true},
     status: {type: Boolean, required: true},
-    reqData: {},
+    reqArr:{type:Array,required:true},
+    template:{type:Number,required:true},
+    templateOptions:{type:Array,required:true},
     type:{type:Number,required:true},
     date: {type: Date, default: Date.now}
 });
@@ -70,7 +72,7 @@ const getReqApi = (api) => {
  */
 const addReqApi = (api) => {
     return new Promise((resolve, reject) => {
-        if (!api.name) resolve({
+        if (!api.name||!api.reqArr) resolve({
             code: 8001,
             msg: "请完整输入API信息"
         });

@@ -42,7 +42,8 @@ const getSetInfo = async () => {
 	let apiReqMap = _.map(apiReqSet, (item) => {
 		return {
 			"url": path.join(proxySet.url, item.name),
-			"reqData": item.reqData,
+			"reqArr": item.reqArr,
+			"template":item.template,
 			"status": item.status,
 			"id": item._id,
 			"type": item.type,
@@ -95,7 +96,8 @@ const getSetInfo = async () => {
 	apiEmiiter.on('apireqlistadd', function (result) {
 		apiReqMap.push({
 			"url": path.join(proxySet.url, result.name),
-			"reqData": result.reqData,
+            "reqArr": result.reqArr,
+            "template":result.template,
 			"status": result.status,
 			"name": result.name,
 			"type": result.type,
@@ -110,7 +112,8 @@ const getSetInfo = async () => {
 			if (item.id == result.id) {
 				_.extend(item, {
 					"url": path.join(proxySet.url, result.name),
-					"reqData": result.reqData,
+                    "reqArr": result.reqArr,
+                    "template":result.template,
 					"status": result.status,
 					"name": result.name,
 					"type": result.type
@@ -148,8 +151,8 @@ const getSetInfo = async () => {
 
 			_.forEach(apiReqMap, function (item) {
 				if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
-					reqData = item.reqData;
-					reqType = item.type;
+					reqData = item.reqArr[item.template-1].reqData;
+					reqType = item.reqArr[item.template-1].type;
 					return false;
 				}
 			});
