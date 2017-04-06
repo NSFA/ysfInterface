@@ -11,8 +11,10 @@ const Schema = mongoose.Schema;
 const ApiListSchema = new Schema({
     name: {type: String, required: true},
     status: {type: Boolean, required: true},
-    json: {type: JSON, required: true},
+    jsonArr: {type: Array, required: true},
     statusCode:{type:Number,required:true},
+    template:{type:Number,required:true},
+    templateOptions:{type:Array,required:true},
     date: {type: Date, default: Date.now}
 });
 const ApiList = mongoose.model('ApiList', ApiListSchema);
@@ -70,7 +72,7 @@ const getApi = (api) => {
  */
 const addApi = (api) => {
     return new Promise((resolve, reject) => {
-        if (!api.name || !api.json) resolve({
+        if (!api.name || !api.jsonArr) resolve({
             code: 8001,
             msg: "请完整输入API信息"
         });

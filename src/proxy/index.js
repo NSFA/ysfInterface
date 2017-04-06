@@ -19,7 +19,6 @@ const getSetInfo = async () => {
 	const proxySet = await setting.getProxy();
 	const apiSet = await apiList.getApiList();
 	const apiReqSet = await apiReqList.getReqApiList();
-	const urlReg = /(\w+):\/\/(([^\:|\/]+)(\:\d*)?(.*\/)([^#|\?|\n]+))?(#.*)?(\?.*)?/i;
 	// --------------------------------------  事件监听  -------------------------------------- //
 
 
@@ -29,11 +28,12 @@ const getSetInfo = async () => {
 	let apiMap = _.map(apiSet, (item) => {
 		return {
 			"url": path.join(proxySet.url, item.name),
-			"json": item.json,
+			"jsonArr": item.jsonArr,
 			"status": item.status,
 			"statusCode": item.statusCode,
 			"id": item._id,
-			"name": item.name
+			"name": item.name,
+			"template":item.template
 		}
 	});
 	/**
@@ -55,12 +55,13 @@ const getSetInfo = async () => {
 	apiEmiiter.on('apilistadd', function (result) {
 		apiMap.push({
 			"url": path.join(proxySet.url, result.name),
-			"json": result.json,
+			"jsonArr": result.jsonArr,
 			"status": result.status,
 			"statusCode": result.statusCode,
 			"id": result._id,
-			"name": result.name
-		});
+			"name": result.name,
+            "template":result.template,
+        });
 	});
 	/**
 	 * 响应Api编辑监听
@@ -70,10 +71,11 @@ const getSetInfo = async () => {
 			if (item.id == result.id) {
 				_.extend(item, {
 					"url": path.join(proxySet.url, result.name),
-					"json": result.json,
+					"jsonArr": result.jsonArr,
 					"status": result.status,
 					"statusCode": result.statusCode,
-					"name": result.name
+                    "template":result.template,
+                    "name": result.name
 				});
 				return false;
 			}
@@ -138,7 +140,6 @@ const getSetInfo = async () => {
 	// --------------------------------------  rule  -------------------------------------- //
 	const rule = {
 		async beforeSendRequest(requestDetail) {
-			const reqUrl = urlReg.exec(requestDetail.url)[2];
 			const hostname = requestDetail.requestOptions.hostname;
 			const proxyUrl = proxySet.url; // 区分二级域名
 			const path = requestDetail.requestOptions.path.split('?')[0];
@@ -237,16 +238,15 @@ const getSetInfo = async () => {
 		async beforeSendResponse(requestDetail, responseDetail) {
 			let newRes = responseDetail.response;
 
-			const reqUrl = urlReg.exec(requestDetail.url)[2];
 			const hostname = requestDetail.requestOptions.hostname;
 			const proxyUrl = proxySet.url; // 区分二级域名
 			const path = requestDetail.requestOptions.path.split('?')[0];
 
-			
+
 			_.forEach(apiMap, function (item) {
 				if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
 					newRes.header['X-Proxy-By'] = 'YSF-MOCK';
-					newRes.body = JSON.stringify(item.json);
+					newRes.body = JSON.stringify(item.jsonArr[item.template - 1]);
 					newRes.statusCode = item.statusCode || 200;
 					return false;
 				}
