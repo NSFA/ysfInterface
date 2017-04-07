@@ -249,7 +249,7 @@ const getSetInfo = async () => {
 			_.forEach(apiMap, function (item) {
 				if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
 					newRes.header['X-Proxy-By'] = 'YSF-MOCK';
-					newRes.body = JSON.stringify(item.jsonArr[item.template - 1]);
+					newRes.body = JSON.stringify(item.jsonArr[item.template]);
 					newRes.statusCode = item.statusCode || 200;
 					return false;
 				}

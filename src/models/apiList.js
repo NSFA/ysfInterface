@@ -11,11 +11,12 @@ const Schema = mongoose.Schema;
 const ApiListSchema = new Schema({
     name: {type: String, required: true},
     status: {type: Boolean, required: true},
-    jsonArr: {type: Array, required: true},
+    jsonArr: {type:Object,required: true},
     statusCode:{type:Number,required:true},
-    template:{type:Number,required:true},
+    template:{type:String,required:true},
     templateOptions:{type:Array,required:true},
-    date: {type: Date, default: Date.now}
+    date: {type: Date, default: Date.now},
+    update:{type:Date}
 });
 const ApiList = mongoose.model('ApiList', ApiListSchema);
 
@@ -84,6 +85,7 @@ const addApi = (api) => {
                         msg: "已存在相应API"
                     })
                 } else {
+                    api.update=new Date();
                     ApiList.create(api).then((result) => {
                         resolve({
                             result: result,
@@ -94,6 +96,7 @@ const addApi = (api) => {
                 }
             });
         } else {
+            api.update=new Date();
             ApiList.updateOne({_id: api.id}, api).then((result) => {
                 resolve({
                     result: result,
