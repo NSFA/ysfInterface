@@ -151,8 +151,8 @@ const getSetInfo = async () => {
 
 			_.forEach(apiReqMap, function (item) {
 				if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
-					reqData = item.reqArr[item.template-1].reqData;
-					reqType = item.reqArr[item.template-1].type;
+					reqData = item.reqArr[item.template].reqData;
+					reqType = item.reqArr[item.template].type;
 					return false;
 				}
 			});
