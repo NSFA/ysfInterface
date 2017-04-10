@@ -179,9 +179,10 @@ const getSetInfo = async () => {
             };
             //端口
             const Options = requestDetail.requestOptions;
-            Options.port = 80;
+
 
             if (reqData) {
+                Options.port = 80;
                 switch (reqType) {
                     // application/json
                     case 1:
@@ -228,7 +229,7 @@ const getSetInfo = async () => {
                         break;
                 }
             } else if (hostname.indexOf(proxyUrl) > -1) {
-                console.log(requestDetail.url,proxyUrl);
+                Options.port = 80;
                 return {
                     requestOptions: Options
                 }
