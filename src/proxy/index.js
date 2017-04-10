@@ -227,12 +227,11 @@ const getSetInfo = async () => {
                     default:
                         break;
                 }
-            } else {
-                if (requestDetail.url.indexOf(proxySet.result.url) > -1) {
-                    return {
-                        requestOptions: Options
-                    }
+            } else if (hostname.indexOf(proxyUrl) > -1) {
+                return {
+                    requestOptions: Options
                 }
+            } else {
                 return null
             }
         },
