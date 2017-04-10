@@ -1,8 +1,6 @@
 [开发模式] 开发模式下，文件修改后~~自动重启 Node.js~~ 自动热重启服务。       
 
-[调试模式] 断点调试 (test feature)
-
-[线上模式] 借助 pm2 使用 cluster 模式压榨多核 CPU 性能 
+[线上模式] pm2 
 
 ## Npm scripts
 
@@ -13,6 +11,7 @@ $ npm test # 单元测试
 $ npm run compile # 编译
 $ npm run production # 生产模式
 ```
+
 ## 线上部署
 
 ```bash
@@ -30,4 +29,4 @@ cp nginx.conf /etc/nginx/conf.d/YourProject.conf # 自行配置 nginx 反代
 import config from './config'
 ```
 
-默认配置文件位于 `src/config/default.js`, 建议只在这里创建配置字段, 在同目录下创建另一个 `custom.js`, 这个配置会覆盖(override) 默认配置, 且此文件不会被包含在 git 中, 避免密码泄露, 线上配置等问题.
+默认配置文件位于 `src/config/default.js`, 建议只在这里创建配置字段, 在同目录下创建另一个 `custom.js`, 这个配置会覆盖(override) 默认配置.
