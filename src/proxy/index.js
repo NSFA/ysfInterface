@@ -182,14 +182,18 @@ const getSetInfo = async () => {
                 switch (reqType) {
                     // application/json
                     case 1:
+                        const newOption = requestDetail.requestOptions;
+                        newOption.port = 80;
                         try {
                             let ret = Object.assign({}, eval('(' + requestDetail.requestData.toString() + ')'), reqData);
                             return {
-                                requestData: JSON.stringify(ret)
+                                requestData: JSON.stringify(ret),
+                                requestOptions:newOption
                             }
                         } catch (err) {
                             return {
-                                requestData: JSON.stringify(reqData)
+                                requestData: JSON.stringify(reqData),
+                                requestOptions:newOption
                             };
                         }
                         break;
@@ -199,24 +203,29 @@ const getSetInfo = async () => {
                         if (requestDetail.requestOptions.method === 'GET') {
                             const newOption = Object.assign({}, requestDetail.requestOptions);
                             reqForm = mergeRequestBody(requestDetail.requestOptions.path.split('?')[1], reqData);
-
+                            newOption.port = 80;
                             newOption.path = `${requestDetail.requestOptions.path.split('?')[0]}?${reqForm}`;
                             return {
                                 requestOptions: newOption
                             }
                         } else {
-
+                            const newOption = requestDetail.requestOptions;
+                            newOption.port = 80;
                             reqForm = mergeRequestBody(requestDetail.requestData, reqData);
 
                             return {
-                                requestData: reqForm
+                                requestData: reqForm,
+                                requestOptions: newOption
                             }
                         }
                         break;
                     // other
                     case 3:
+                        const newOption = requestDetail.requestOptions;
+                        newOption.port = 80;
                         return {
-                            requestData: reqForm
+                            requestData: reqForm,
+                            requestOptions: newOption
                         };
                         break;
                     default:
