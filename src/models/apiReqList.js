@@ -11,12 +11,12 @@ const Schema = mongoose.Schema;
 const ApiReqListSchema = new Schema({
     name: {type: String, required: true},
     status: {type: Boolean, required: true},
-    reqArr:{type:Object,required:true},
-    template:{type:String,required:true},
-    templateOptions:{type:Array,required:true},
-    type:{type:Number,required:true},
+    reqArr: {type: Object, required: true},
+    template: {type: String, required: true},
+    templateOptions: {type: Array, required: true},
+    type: {type: Number, required: true},
     date: {type: Date, default: Date.now},
-    update:{type:Date}
+    update: {type: Date}
 });
 const ApiReqList = mongoose.model('ApiReqList', ApiReqListSchema);
 
@@ -27,7 +27,11 @@ const ApiReqList = mongoose.model('ApiReqList', ApiReqListSchema);
 const getReqApiList = () => {
     return new Promise((resolve, reject) => {
         ApiReqList.find().sort({"name": -1}).then((result) => {
-            resolve(result);
+            resolve({
+                "result": result,
+                "code": 200,
+                "msg": "获取Api列表成功"
+            });
         });
     });
 };
@@ -73,19 +77,22 @@ const getReqApi = (api) => {
  */
 const addReqApi = (api) => {
     return new Promise((resolve, reject) => {
-        if (!api.name||!api.reqArr) resolve({
-            code: 8001,
-            msg: "请完整输入API信息"
+        if (!api.name || !api.reqArr) resolve({
+            code: 400,
+            msg: "请完整输入API信息",
+            result: ""
         });
+        //添加
         if (api.id === -1) {
             ApiReqList.find({name: api.name}).then((res) => {
                 if (res.length) {
                     resolve({
-                        code: 8000,
-                        msg: "已存在相应API"
+                        code: 400,
+                        msg: "已存在相应API",
+                        result: ""
                     })
                 } else {
-                    api.update=new Date();
+                    api.update = new Date();
                     ApiReqList.create(api).then((result) => {
                         resolve({
                             result: result,
@@ -96,7 +103,8 @@ const addReqApi = (api) => {
                 }
             });
         } else {
-            api.update=new Date();
+            //编辑
+            api.update = new Date();
             ApiReqList.updateOne({_id: api.id}, api).then((result) => {
                 resolve({
                     result: result,

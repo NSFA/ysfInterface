@@ -1,7 +1,6 @@
 /**
  * 用户表
  * Created by qingze
- * User: hzqingze
  * Date: 2017/3/23
  * Time: 下午2:55
  **/

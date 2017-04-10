@@ -1,7 +1,6 @@
 /**
  * api接口
  * Created by qingze
- * User: hzqingze
  * Date: 2017/3/24
  * Time: 下午4:49
  **/
@@ -15,22 +14,22 @@ import jsonCtx from './ctx';
 import apiEmiiter from '../proxy/emmiter';
 const router = new Router();
 /**
- * 登录项
+ * 登录
  */
 router.post('/login', async (ctx, next) => {
     const requestData = ctx.request.body;
-    const info = await User.getUser(requestData.account);
-    if (info && info.password === requestData.password) {
+    const res = await User.getUser(requestData.account);
+    if (res && res.password === requestData.password) {
         ctx.cookies.set(
             'login', true, {
-                maxAge: 60 * 60 * 1000,
+                maxAge: 60 * 60 * 1000 * 2, //两小时
                 httpOnly: false,
                 overwrite: false
             }
         );
-        ctx.body = jsonCtx.loginSuccess;
+        ctx.body = jsonCtx.success;
     } else {
-        ctx.body = jsonCtx.loginFailed;
+        ctx.body = jsonCtx.fail;
     }
 });
 
@@ -38,12 +37,7 @@ router.post('/login', async (ctx, next) => {
  * 获取AnyProxy设置
  */
 router.get('/getProxy', async (ctx, next) => {
-    const result = await Setting.getProxy();
-    ctx.body = {
-        "result": result,
-        "code": 200,
-        "msg": "success"
-    }
+    ctx.body = await Setting.getProxy()
 });
 
 /**
@@ -51,25 +45,16 @@ router.get('/getProxy', async (ctx, next) => {
  */
 router.post('/setProxy', async (ctx, next) => {
     const requestData = ctx.request.body;
-    const settingRes = await Setting.setProxy(requestData);
-    settingRes.ok === 1 && apiEmiiter.emit('urlchange', requestData.url);
-    ctx.body = {
-        "result": settingRes,
-        "code": settingRes.ok === 1 ? 200 : 8000,
-        "msg": settingRes.ok === 1 ? "保存成功" : "保存失败"
-    }
+    const res = await Setting.setProxy(requestData);
+    res.ok === 1 && apiEmiiter.emit('urlchange', requestData.url);
+    ctx.body = res;
 });
 
 /**
  * 获取API列表
  */
 router.get('/getApiList', async (ctx, next) => {
-    const list = await apiList.getApiList();
-    ctx.body = {
-        "result": list,
-        "code": 200,
-        "msg": "Api列表在这里"
-    }
+    ctx.body = await apiList.getApiList();
 });
 
 /**
@@ -77,19 +62,15 @@ router.get('/getApiList', async (ctx, next) => {
  */
 router.post('/addApi', async (ctx, next) => {
     const requestData = ctx.request.body;
-    const info = await apiList.addApi(requestData);
-    if (info.code === 200) {
+    const res = await apiList.addApi(requestData);
+    if (res.code === 200) {
         if (requestData.id === -1) {
-            apiEmiiter.emit('apilistadd', info.result);
+            apiEmiiter.emit('apilistadd', res.result);
         } else {
             apiEmiiter.emit('apilistedit', requestData);
         }
     }
-    ctx.body = {
-        "result": info.result || "",
-        "code": info.code,
-        "msg": info.msg
-    }
+    ctx.body = res;
 });
 
 /**
@@ -97,13 +78,9 @@ router.post('/addApi', async (ctx, next) => {
  */
 router.post('/delApi', async (ctx, next) => {
     const requestData = ctx.request.body;
-    const info = await apiList.delApi(requestData);
-    info.code === 200 && apiEmiiter.emit('apilistdel', requestData.id);
-    ctx.body = {
-        "result": info.result || "",
-        "code": info.code,
-        "msg": info.msg
-    }
+    const res = await apiList.delApi(requestData);
+    res.code === 200 && apiEmiiter.emit('apilistdel', requestData.id);
+    ctx.body = res;
 });
 
 /**
@@ -111,12 +88,7 @@ router.post('/delApi', async (ctx, next) => {
  */
 router.get('/getApi', async (ctx, next) => {
     const requestData = ctx.request.query;
-    const info = await apiList.getApi(requestData);
-    ctx.body = {
-        "result": info.result || "",
-        "code": info.code,
-        "msg": info.msg
-    }
+    ctx.body = await apiList.getApi(requestData);
 });
 
 
@@ -124,12 +96,7 @@ router.get('/getApi', async (ctx, next) => {
  * 获取API列表
  */
 router.get('/getReqApiList', async (ctx, next) => {
-    const list = await apiReqList.getReqApiList();
-    ctx.body = {
-        "result": list,
-        "code": 200,
-        "msg": "ReqApi列表在这里"
-    }
+    ctx.body = await apiReqList.getReqApiList();
 });
 
 /**
@@ -137,19 +104,15 @@ router.get('/getReqApiList', async (ctx, next) => {
  */
 router.post('/addReqApi', async (ctx, next) => {
     const requestData = ctx.request.body;
-    const info = await apiReqList.addReqApi(requestData);
-    if (info.code === 200) {
+    const res = await apiReqList.addReqApi(requestData);
+    if (res.code === 200) {
         if (requestData.id === -1) {
-            apiEmiiter.emit('apireqlistadd', info.result);
+            apiEmiiter.emit('apireqlistadd', res.result);
         } else {
             apiEmiiter.emit('apireqlistedit', requestData);
         }
     }
-    ctx.body = {
-        "result": info.result || "",
-        "code": info.code,
-        "msg": info.msg
-    }
+    ctx.body = res;
 });
 
 /**
@@ -157,13 +120,9 @@ router.post('/addReqApi', async (ctx, next) => {
  */
 router.post('/delReqApi', async (ctx, next) => {
     const requestData = ctx.request.body;
-    const info = await apiReqList.delReqApi(requestData);
-    info.code === 200 && apiEmiiter.emit('apireqlistdel', requestData.id);
-    ctx.body = {
-        "result": info.result || "",
-        "code": info.code,
-        "msg": info.msg
-    }
+    const res = await apiReqList.delReqApi(requestData);
+    res.code === 200 && apiEmiiter.emit('apireqlistdel', requestData.id);
+    ctx.body = res;
 });
 
 /**
@@ -171,12 +130,7 @@ router.post('/delReqApi', async (ctx, next) => {
  */
 router.get('/getReqApi', async (ctx, next) => {
     const requestData = ctx.request.query;
-    const info = await apiReqList.getReqApi(requestData);
-    ctx.body = {
-        "result": info.result || "",
-        "code": info.code,
-        "msg": info.msg
-    }
+    ctx.body = await apiReqList.getReqApi(requestData)
 });
 
 export default router

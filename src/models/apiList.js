@@ -1,7 +1,6 @@
 /**
  * API列表
  * Created by qingze
- * User: hzqingze
  * Date: 2017/3/24
  * Time: 下午1:49
  **/
@@ -18,6 +17,7 @@ const ApiListSchema = new Schema({
     date: {type: Date, default: Date.now},
     update:{type:Date}
 });
+
 const ApiList = mongoose.model('ApiList', ApiListSchema);
 
 /**
@@ -27,7 +27,11 @@ const ApiList = mongoose.model('ApiList', ApiListSchema);
 const getApiList = () => {
     return new Promise((resolve, reject) => {
         ApiList.find().sort({"name":-1}).then((result) => {
-            resolve(result);
+            resolve({
+                "result": result,
+                "code": 200,
+                "msg": "获取Api列表成功"
+            });
         });
     });
 };
@@ -74,14 +78,17 @@ const getApi = (api) => {
 const addApi = (api) => {
     return new Promise((resolve, reject) => {
         if (!api.name || !api.jsonArr) resolve({
-            code: 8001,
+            code: 400,
+            result:"",
             msg: "请完整输入API信息"
         });
+        //新建Api
         if (api.id === -1) {
             ApiList.find({name: api.name}).then((res) => {
                 if (res.length) {
                     resolve({
-                        code: 8000,
+                        code: 400,
+                        result:"",
                         msg: "已存在相应API"
                     })
                 } else {
@@ -96,6 +103,7 @@ const addApi = (api) => {
                 }
             });
         } else {
+            //编辑Api
             api.update=new Date();
             ApiList.updateOne({_id: api.id}, api).then((result) => {
                 resolve({
