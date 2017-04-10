@@ -193,7 +193,7 @@ const getSetInfo = async () => {
 					// application/json
 					case 1:
 						try{
-							let ret = _.defaultsDeep({}, eval('('+ requestDetail.requestData.toString() + ')'), reqData);
+							let ret = _.defaults({}, eval('('+ requestDetail.requestData.toString() + ')'), reqData);
 							return {
 								requestData : JSON.stringify(ret)
 							}
