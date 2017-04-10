@@ -177,25 +177,24 @@ const getSetInfo = async () => {
                 }).join('&')
 
             };
+            //端口
+            const Options = requestDetail.requestOptions;
+            Options.port = 80;
 
             if (reqData) {
                 switch (reqType) {
                     // application/json
                     case 1:
                         try {
-                            const newOption = requestDetail.requestOptions;
-                            newOption.port = 80;
                             let ret = Object.assign({}, eval('(' + requestDetail.requestData.toString() + ')'), reqData);
                             return {
                                 requestData: JSON.stringify(ret),
-                                requestOptions:newOption
+                                requestOptions: Options
                             }
                         } catch (err) {
-                            const newOption = requestDetail.requestOptions;
-                            newOption.port = 80;
                             return {
                                 requestData: JSON.stringify(reqData),
-                                requestOptions:newOption
+                                requestOptions: Options
                             };
                         }
                         break;
@@ -211,34 +210,27 @@ const getSetInfo = async () => {
                                 requestOptions: newOption
                             }
                         } else {
-                            const newOption = requestDetail.requestOptions;
-                            newOption.port = 80;
                             reqForm = mergeRequestBody(requestDetail.requestData, reqData);
-
                             return {
                                 requestData: reqForm,
-                                requestOptions: newOption
+                                requestOptions: Options
                             }
                         }
                         break;
                     // other
                     case 3:
-                        const newOption = requestDetail.requestOptions;
-                        newOption.port = 80;
                         return {
                             requestData: reqForm,
-                            requestOptions: newOption
+                            requestOptions: Options
                         };
                         break;
                     default:
                         break;
                 }
             } else {
-                if(requestDetail.url.indexOf(proxySet.result.url)){
-                    const newOption = requestDetail.requestOptions;
-                    newOption.port = 80;
+                if (requestDetail.url.indexOf(proxySet.result.url) > -1) {
                     return {
-                        requestOptions: newOption
+                        requestOptions: Options
                     }
                 }
                 return null
@@ -247,9 +239,9 @@ const getSetInfo = async () => {
         async beforeSendResponse(requestDetail, responseDetail) {
             let newRes = responseDetail.response;
 
-			const hostname = requestDetail.requestOptions.hostname;
-			const proxyUrl = proxySet.result.url; // 区分二级域名
-			const path = requestDetail.requestOptions.path.split('?')[0];
+            const hostname = requestDetail.requestOptions.hostname;
+            const proxyUrl = proxySet.result.url; // 区分二级域名
+            const path = requestDetail.requestOptions.path.split('?')[0];
 
             _.forEach(apiMap, function (item) {
                 if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
