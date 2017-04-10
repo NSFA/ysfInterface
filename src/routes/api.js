@@ -11,7 +11,7 @@ import apiList from '../models/apiList'
 import apiReqList from '../models/apiReqList'
 
 import jsonCtx from './ctx';
-import apiEmiiter from '../proxy/emmiter';
+import apiEmmiter from '../proxy/emmiter';
 const router = new Router();
 /**
  * 登录
@@ -46,7 +46,7 @@ router.get('/getProxy', async (ctx, next) => {
 router.post('/setProxy', async (ctx, next) => {
     const requestData = ctx.request.body;
     const res = await Setting.setProxy(requestData);
-    res.ok === 1 && apiEmiiter.emit('urlchange', requestData.url);
+    res.ok === 1 && apiEmmiter.emit('urlchange', requestData.url);
     ctx.body = res;
 });
 
@@ -65,9 +65,9 @@ router.post('/addApi', async (ctx, next) => {
     const res = await apiList.addApi(requestData);
     if (res.code === 200) {
         if (requestData.id === -1) {
-            apiEmiiter.emit('apilistadd', res.result);
+            apiEmmiter.emit('apilistadd', res.result);
         } else {
-            apiEmiiter.emit('apilistedit', requestData);
+            apiEmmiter.emit('apilistedit', requestData);
         }
     }
     ctx.body = res;
@@ -79,7 +79,7 @@ router.post('/addApi', async (ctx, next) => {
 router.post('/delApi', async (ctx, next) => {
     const requestData = ctx.request.body;
     const res = await apiList.delApi(requestData);
-    res.code === 200 && apiEmiiter.emit('apilistdel', requestData.id);
+    res.code === 200 && apiEmmiter.emit('apilistdel', requestData.id);
     ctx.body = res;
 });
 
@@ -107,9 +107,9 @@ router.post('/addReqApi', async (ctx, next) => {
     const res = await apiReqList.addReqApi(requestData);
     if (res.code === 200) {
         if (requestData.id === -1) {
-            apiEmiiter.emit('apireqlistadd', res.result);
+            apiEmmiter.emit('apireqlistadd', res.result);
         } else {
-            apiEmiiter.emit('apireqlistedit', requestData);
+            apiEmmiter.emit('apireqlistedit', requestData);
         }
     }
     ctx.body = res;
@@ -121,7 +121,7 @@ router.post('/addReqApi', async (ctx, next) => {
 router.post('/delReqApi', async (ctx, next) => {
     const requestData = ctx.request.body;
     const res = await apiReqList.delReqApi(requestData);
-    res.code === 200 && apiEmiiter.emit('apireqlistdel', requestData.id);
+    res.code === 200 && apiEmmiter.emit('apireqlistdel', requestData.id);
     ctx.body = res;
 });
 
