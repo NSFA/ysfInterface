@@ -193,7 +193,7 @@ const getSetInfo = async () => {
 					// application/json
 					case 1:
 						try{
-							let ret = _.merge({}, eval('('+ requestDetail.requestData.toString() + ')'), reqData);
+							let ret = Object.assign({}, eval('('+ requestDetail.requestData.toString() + ')'), reqData);
 							return {
 								requestData : JSON.stringify(ret)
 							}
