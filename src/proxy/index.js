@@ -228,6 +228,7 @@ const getSetInfo = async () => {
                         break;
                 }
             } else if (hostname.indexOf(proxyUrl) > -1) {
+                console.log(requestDetail.url,proxyUrl);
                 return {
                     requestOptions: Options
                 }
