@@ -21,9 +21,9 @@ const getSetInfo = async () => {
     /**
      * 响应Api表
      */
-    let apiMap = _.map(apiSet, (item) => {
+    let apiMap = _.map(apiSet.result, (item) => {
         return {
-            "url": path.join(proxySet.url, item.name),
+            "url": path.join(proxySet.result.url, item.name),
             "jsonArr": item.jsonArr,
             "status": item.status,
             "statusCode": item.statusCode,
@@ -35,9 +35,9 @@ const getSetInfo = async () => {
     /**
      * 请求Api表
      */
-    let apiReqMap = _.map(apiReqSet, (item) => {
+    let apiReqMap = _.map(apiReqSet.result, (item) => {
         return {
-            "url": path.join(proxySet.url, item.name),
+            "url": path.join(proxySet.result.url, item.name),
             "reqArr": item.reqArr,
             "template": item.template,
             "status": item.status,
@@ -51,7 +51,7 @@ const getSetInfo = async () => {
      */
     apiEmmiter.on('apilistadd', function (result) {
         apiMap.push({
-            "url": path.join(proxySet.url, result.name),
+            "url": path.join(proxySet.result.url, result.name),
             "jsonArr": result.jsonArr,
             "status": result.status,
             "statusCode": result.statusCode,
@@ -67,7 +67,7 @@ const getSetInfo = async () => {
         apiMap = _.forEach(apiMap, function (item) {
             if (item.id == result.id) {
                 _.extend(item, {
-                    "url": path.join(proxySet.url, result.name),
+                    "url": path.join(proxySet.result.url, result.name),
                     "jsonArr": result.jsonArr,
                     "status": result.status,
                     "statusCode": result.statusCode,
@@ -91,7 +91,7 @@ const getSetInfo = async () => {
      */
     apiEmmiter.on('apireqlistadd', function (result) {
         apiReqMap.push({
-            "url": path.join(proxySet.url, result.name),
+            "url": path.join(proxySet.result.url, result.name),
             "reqArr": result.reqArr,
             "template": result.template,
             "status": result.status,
@@ -107,7 +107,7 @@ const getSetInfo = async () => {
         apiReqMap = _.forEach(apiReqMap, function (item) {
             if (item.id == result.id) {
                 _.extend(item, {
-                    "url": path.join(proxySet.url, result.name),
+                    "url": path.join(proxySet.result.url, result.name),
                     "reqArr": result.reqArr,
                     "template": result.template,
                     "status": result.status,
@@ -139,7 +139,7 @@ const getSetInfo = async () => {
     const rule = {
         async beforeSendRequest(requestDetail) {
             const hostname = requestDetail.requestOptions.hostname;
-            const proxyUrl = proxySet.url; // 区分二级域名
+            const proxyUrl = proxySet.result.url; // 区分二级域名
             const path = requestDetail.requestOptions.path.split('?')[0];
             let reqData, reqType;
 
@@ -230,7 +230,7 @@ const getSetInfo = async () => {
             let newRes = responseDetail.response;
 
 			const hostname = requestDetail.requestOptions.hostname;
-			const proxyUrl = proxySet.url; // 区分二级域名
+			const proxyUrl = proxySet.result.url; // 区分二级域名
 			const path = requestDetail.requestOptions.path.split('?')[0];
 
             _.forEach(apiMap, function (item) {
@@ -247,15 +247,15 @@ const getSetInfo = async () => {
         },
     };
     return {
-        port: proxySet.port,
+        port: proxySet.result.port,
         rule: rule,
         webInterface: {
             enable: true,
-            webPort: proxySet.anyproxy_port,
-            wsPort: proxySet.ws_port,
+            webPort: proxySet.result.anyproxy_port,
+            wsPort: proxySet.result.ws_port,
         },
-        throttle: proxySet.throttle || '',
-        forceProxyHttps: proxySet.forceProxyHttps,
+        throttle: proxySet.result.throttle || '',
+        forceProxyHttps: proxySet.result.forceProxyHttps,
         silent: false
     };
 };
