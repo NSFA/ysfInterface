@@ -182,15 +182,17 @@ const getSetInfo = async () => {
                 switch (reqType) {
                     // application/json
                     case 1:
-                        const newOption = requestDetail.requestOptions;
-                        newOption.port = 80;
                         try {
+                            const newOption = requestDetail.requestOptions;
+                            newOption.port = 80;
                             let ret = Object.assign({}, eval('(' + requestDetail.requestData.toString() + ')'), reqData);
                             return {
                                 requestData: JSON.stringify(ret),
                                 requestOptions:newOption
                             }
                         } catch (err) {
+                            const newOption = requestDetail.requestOptions;
+                            newOption.port = 80;
                             return {
                                 requestData: JSON.stringify(reqData),
                                 requestOptions:newOption
