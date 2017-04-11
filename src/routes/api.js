@@ -133,4 +133,18 @@ router.get('/getReqApi', async (ctx, next) => {
     ctx.body = await apiReqList.getReqApi(requestData)
 });
 
+/**
+ * 设置api状态
+ */
+router.post('/setApiStatus', async (ctx, next) => {
+    const req = ctx.request.body;
+    let res;
+    if (req.list === "req") {
+        res = await apiReqList.updateStatus(req);
+    } else {
+        res = await apiList.updateStatus(req);
+    }
+    ctx.body = res;
+});
+
 export default router

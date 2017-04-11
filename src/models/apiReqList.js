@@ -115,8 +115,30 @@ const addReqApi = (api) => {
         }
     });
 };
-
+/**
+ * 更新状态
+ * @param req
+ * @returns {Promise}
+ */
+const updateStatus = (req) => {
+    return new Promise((resolve, reject) => {
+        ApiReqList.findByIdAndUpdate(req.id, {$set: {status: req.status}}, function (err, result) {
+            if (err) {
+                reject({
+                    code: 500,
+                    message: "编辑失败",
+                    result: err
+                })
+            }
+            resolve({
+                result: "",
+                code: 200,
+                msg: "编辑API成功"
+            })
+        });
+    });
+};
 
 export default {
-    addReqApi, getReqApiList, delReqApi, getReqApi
+    addReqApi, getReqApiList, delReqApi, getReqApi,updateStatus
 }

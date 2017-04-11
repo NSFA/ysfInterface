@@ -10,12 +10,12 @@ const Schema = mongoose.Schema;
 const ApiListSchema = new Schema({
     name: {type: String, required: true},
     status: {type: Boolean, required: true},
-    jsonArr: {type:Object,required: true},
-    statusCode:{type:Number,required:true},
-    template:{type:String,required:true},
-    templateOptions:{type:Array,required:true},
+    jsonArr: {type: Object, required: true},
+    statusCode: {type: Number, required: true},
+    template: {type: String, required: true},
+    templateOptions: {type: Array, required: true},
     date: {type: Date, default: Date.now},
-    update:{type:Date}
+    update: {type: Date}
 });
 
 const ApiList = mongoose.model('ApiList', ApiListSchema);
@@ -26,7 +26,7 @@ const ApiList = mongoose.model('ApiList', ApiListSchema);
  */
 const getApiList = () => {
     return new Promise((resolve, reject) => {
-        ApiList.find().sort({"name":-1}).then((result) => {
+        ApiList.find().sort({"name": -1}).then((result) => {
             resolve({
                 "result": result,
                 "code": 200,
@@ -79,7 +79,7 @@ const addApi = (api) => {
     return new Promise((resolve, reject) => {
         if (!api.name || !api.jsonArr) resolve({
             code: 400,
-            result:"",
+            result: "",
             msg: "请完整输入API信息"
         });
         //新建Api
@@ -88,23 +88,23 @@ const addApi = (api) => {
                 if (res.length) {
                     resolve({
                         code: 400,
-                        result:"",
+                        result: "",
                         msg: "已存在相应API"
                     })
                 } else {
-                    api.update=new Date();
+                    api.update = new Date();
                     ApiList.create(api).then((result) => {
                         resolve({
                             result: result,
                             code: 200,
-                            msg:"创建API成功"
+                            msg: "创建API成功"
                         });
                     });
                 }
             });
         } else {
             //编辑Api
-            api.update=new Date();
+            api.update = new Date();
             ApiList.updateOne({_id: api.id}, api).then((result) => {
                 resolve({
                     result: result,
@@ -115,8 +115,30 @@ const addApi = (api) => {
         }
     });
 };
-
+/**
+ * 更新状态
+ * @param req
+ * @returns {Promise}
+ */
+const updateStatus = (req) => {
+    return new Promise((resolve, reject) => {
+        ApiList.findByIdAndUpdate(req.id, {$set: {status: req.status}}, function (err, result) {
+            if (err) {
+                reject({
+                    code: 500,
+                    message: "编辑失败",
+                    result: err
+                })
+            }
+            resolve({
+                result: "",
+                code: 200,
+                msg: "编辑API成功"
+            })
+        });
+    });
+};
 
 export default {
-    addApi, getApiList, delApi, getApi
+    addApi, getApiList, delApi, getApi, updateStatus
 }
