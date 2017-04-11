@@ -134,6 +134,26 @@ const getSetInfo = async () => {
             item.url = path.join(url, item.name)
         });
     });
+    /**
+     * apistatus
+     */
+    apiEmmiter.on('apistatus', function (req) {
+        if (req.list === "req") {
+            apiReqMap = _.forEach(apiReqMap, (item) => {
+                if (item.id == req.id) {
+                    item.status = req.status;
+                    return !1;
+                }
+            });
+        } else {
+            apiMap = _.forEach(apiMap, (item) => {
+                if (item.id == req.id) {
+                    item.status = req.status;
+                    return !1;
+                }
+            });
+        }
+    });
 
     // --------------------------------------  rule  -------------------------------------- //
     const rule = {

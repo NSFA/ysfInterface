@@ -144,6 +144,9 @@ router.post('/setApiStatus', async (ctx, next) => {
     } else {
         res = await apiList.updateStatus(req);
     }
+    if (res.code === 200) {
+        apiEmmiter.emit('apistatus',req);
+    }
     ctx.body = res;
 });
 
