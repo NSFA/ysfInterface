@@ -197,25 +197,19 @@ const getSetInfo = async () => {
                 }).join('&')
 
             };
-            //端口
-            const Options = requestDetail.requestOptions;
-
 
             if (reqData) {
-                Options.port = 80;
                 switch (reqType) {
                     // application/json
                     case 1:
                         try {
                             let ret = Object.assign({}, eval('(' + requestDetail.requestData.toString() + ')'), reqData);
                             return {
-                                requestData: JSON.stringify(ret),
-                                requestOptions: Options
+                                requestData: JSON.stringify(ret)
                             }
                         } catch (err) {
                             return {
-                                requestData: JSON.stringify(reqData),
-                                requestOptions: Options
+                                requestData: JSON.stringify(reqData)
                             };
                         }
                         break;
@@ -225,7 +219,6 @@ const getSetInfo = async () => {
                         if (requestDetail.requestOptions.method === 'GET') {
                             const newOption = Object.assign({}, requestDetail.requestOptions);
                             reqForm = mergeRequestBody(requestDetail.requestOptions.path.split('?')[1], reqData);
-                            newOption.port = 80;
                             newOption.path = `${requestDetail.requestOptions.path.split('?')[0]}?${reqForm}`;
                             return {
                                 requestOptions: newOption
@@ -233,25 +226,18 @@ const getSetInfo = async () => {
                         } else {
                             reqForm = mergeRequestBody(requestDetail.requestData, reqData);
                             return {
-                                requestData: reqForm,
-                                requestOptions: Options
+                                requestData: reqForm
                             }
                         }
                         break;
                     // other
                     case 3:
                         return {
-                            requestData: reqForm,
-                            requestOptions: Options
+                            requestData: reqForm
                         };
                         break;
                     default:
                         break;
-                }
-            } else if (hostname.indexOf(proxyUrl) > -1) {
-                Options.port = 80;
-                return {
-                    requestOptions: Options
                 }
             } else {
                 return null
