@@ -10,7 +10,7 @@ import apiReqList from '../models/apiReqList'
 import _ from 'lodash';
 import path from 'path';
 import apiEmmiter from './emmiter';
-import AnyProxy from 'anyproxy'
+import AnyProxy from '../../proxy/proxy'
 
 const getSetInfo = async () => {
 
@@ -266,11 +266,7 @@ const getSetInfo = async () => {
     return {
         port: proxySet.result.port,
         rule: rule,
-        webInterface: {
-            enable: true,
-            webPort: proxySet.result.anyproxy_port,
-            wsPort: proxySet.result.ws_port,
-        },
+        wsPort: proxySet.result.ws_port,
         throttle: proxySet.result.throttle || '',
         forceProxyHttps: proxySet.result.forceProxyHttps,
         silent: false

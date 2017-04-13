@@ -9,7 +9,8 @@ import User from '../models/user';
 import Setting from '../models/setting'
 import apiList from '../models/apiList'
 import apiReqList from '../models/apiReqList'
-
+import certMgr from'../../proxy/lib/certMgr'
+import util from'../../proxy/lib/util'
 import jsonCtx from './ctx';
 import apiEmmiter from '../proxy/emmiter';
 const router = new Router();
@@ -148,6 +149,25 @@ router.post('/setApiStatus', async (ctx, next) => {
         apiEmmiter.emit('apistatus',req);
     }
     ctx.body = res;
+});
+
+router.get('/getInitData', async (ctx, next) => {
+    const rootCAExists = certMgr.isRootCAFileExists();
+    const rootDirPath = certMgr.getRootDirPath();
+    const interceptFlag = false;
+    const globalProxyFlag = false;
+    const setting = await Setting.getProxy();
+
+    ctx.body={
+        status: 'success',
+        rootCAExists,
+        rootCADirPath: rootDirPath,
+        currentInterceptFlag: interceptFlag,
+        currentGlobalProxyFlag: globalProxyFlag,
+        ipAddress: util.getAllIpAddress(),
+        port: setting.result.anyproxy_port,
+        wsPort:setting.result.ws_port
+    };
 });
 
 export default router
