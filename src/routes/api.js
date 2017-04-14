@@ -13,6 +13,8 @@ import certMgr from'../../proxy/lib/certMgr'
 import util from'../../proxy/lib/util'
 import jsonCtx from './ctx';
 import apiEmmiter from '../proxy/emmiter';
+
+import nedb from '../models/nebd'
 const router = new Router();
 /**
  * 登录
@@ -146,7 +148,7 @@ router.post('/setApiStatus', async (ctx, next) => {
         res = await apiList.updateStatus(req);
     }
     if (res.code === 200) {
-        apiEmmiter.emit('apistatus',req);
+        apiEmmiter.emit('apistatus', req);
     }
     ctx.body = res;
 });
@@ -158,7 +160,7 @@ router.get('/getInitData', async (ctx, next) => {
     const globalProxyFlag = false;
     const setting = await Setting.getProxy();
 
-    ctx.body={
+    ctx.body = {
         status: 'success',
         rootCAExists,
         rootCADirPath: rootDirPath,
@@ -166,8 +168,13 @@ router.get('/getInitData', async (ctx, next) => {
         currentGlobalProxyFlag: globalProxyFlag,
         ipAddress: util.getAllIpAddress(),
         port: setting.result.anyproxy_port,
-        wsPort:setting.result.ws_port
+        wsPort: setting.result.ws_port
     };
 });
+
+router.get('/latestLog', async (ctx, next) => {
+    ctx.body = await nedb.latestLog();
+});
+
 
 export default router

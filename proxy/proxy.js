@@ -198,13 +198,14 @@ class ProxyServer extends ProxyCore {
      */
     constructor(config) {
         // prepare a recorder
-        const recorder = new Recorder();
+        global.recorder = new Recorder();
+        const recorder =global.recorder;
         const configForCore = Object.assign({
             recorder,
         }, config);
 
         super(configForCore);
-        this.recorder = recorder;
+        this.recorder = global.recorder;
         this.wsServer = null;
     }
 
@@ -214,7 +215,7 @@ class ProxyServer extends ProxyCore {
         if (this.wsPort) {
             this.wsServer = new wsServer({
                 port: this.wsPort
-            }, this.recorder);
+            }, global.recorder);
             this.wsServer.start();
         }
     }
@@ -224,13 +225,13 @@ class ProxyServer extends ProxyCore {
 
         this.wsServer && this.wsServer.closeAll();
 
-        if (this.recorder) {
+        if (global.recorder) {
             logUtil.printLog('clearing cache file...');
-            this.recorder.clear();
+            global.recorder.clear();
         }
 
         this.wsServer = null;
-        this.recorder = null;
+        global.recorder = null;
 
         return new Promise((resolve, reject) => {
             resolve(null);
