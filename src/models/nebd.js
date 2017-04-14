@@ -12,8 +12,6 @@ const latestLog = () => {
             .sort({_id: 1})
             .limit(10000)
             .exec((err, result) => {
-                console.log(err, result);
-                console.log(result);
                 if (err) reject(err.toString());
                 resolve({
                     "result": result,
