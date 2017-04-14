@@ -153,6 +153,9 @@ router.post('/setApiStatus', async (ctx, next) => {
     ctx.body = res;
 });
 
+/**
+ * 获取初始化信息
+ */
 router.get('/getInitData', async (ctx, next) => {
     const rootCAExists = certMgr.isRootCAFileExists();
     const rootDirPath = certMgr.getRootDirPath();
@@ -172,8 +175,40 @@ router.get('/getInitData', async (ctx, next) => {
     };
 });
 
+/**
+ * 获取列表
+ */
 router.get('/latestLog', async (ctx, next) => {
     ctx.body = await nedb.latestLog();
+});
+
+/**
+ * 获取请求内容
+ */
+router.get('/getReqBody', async (ctx, next) => {
+    const query = ctx.request.query;
+    const result = await nedb.getLogBody(query.id);
+    if (!result || !result.content) {
+        ctx.body = {};
+    } else if (result.type && result.type === 'image' && result.mime) {
+        if (query.raw) {
+            ctx.type = result.mime;
+            ctx.body = result.content;
+        } else {
+            ctx.body = {
+                id: query.id,
+                type: result.type,
+                ref: '/api/getReqBody?id=' + query.id + '&raw=true'
+            };
+        }
+    } else {
+        ctx.body = {
+            id: query.id,
+            type: result.type,
+            content: result.content
+        };
+    }
+
 });
 
 
