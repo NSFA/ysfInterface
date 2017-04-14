@@ -9,7 +9,7 @@ import apiList from '../models/apiList'
 import apiReqList from '../models/apiReqList'
 import _ from 'lodash';
 import path from 'path';
-import apiEmmiter from './emmiter';
+import emitter from './emitter';
 import AnyProxy from '../../proxy/proxy'
 import {ThrottleGroup} from 'stream-throttle'
 import logUtil from'../../proxy/lib/log'
@@ -53,7 +53,7 @@ const getSetInfo = async () => {
     /**
      * 响应Api添加监听
      */
-    apiEmmiter.on('apilistadd', function (result) {
+    emitter.on('apilistadd', function (result) {
         apiMap.push({
             "url": path.join(proxySet.result.url, result.name),
             "jsonArr": result.jsonArr,
@@ -67,7 +67,7 @@ const getSetInfo = async () => {
     /**
      * 响应Api编辑监听
      */
-    apiEmmiter.on('apilistedit', function (result) {
+    emitter.on('apilistedit', function (result) {
         apiMap = _.forEach(apiMap, function (item) {
             if (item.id == result.id) {
                 _.extend(item, {
@@ -85,7 +85,7 @@ const getSetInfo = async () => {
     /**
      * 响应Api删除监听
      */
-    apiEmmiter.on('apilistdel', function (id) {
+    emitter.on('apilistdel', function (id) {
         apiMap = _.filter(apiMap, function (item) {
             return item.id != id
         });
@@ -93,7 +93,7 @@ const getSetInfo = async () => {
     /**
      * 请求Api添加监听
      */
-    apiEmmiter.on('apireqlistadd', function (result) {
+    emitter.on('apireqlistadd', function (result) {
         apiReqMap.push({
             "url": path.join(proxySet.result.url, result.name),
             "reqArr": result.reqArr,
@@ -107,7 +107,7 @@ const getSetInfo = async () => {
     /**
      * 请求Api编辑监听
      */
-    apiEmmiter.on('apireqlistedit', function (result) {
+    emitter.on('apireqlistedit', function (result) {
         apiReqMap = _.forEach(apiReqMap, function (item) {
             if (item.id == result.id) {
                 _.extend(item, {
@@ -125,7 +125,7 @@ const getSetInfo = async () => {
     /**
      * 请求Api删除监听
      */
-    apiEmmiter.on('apireqlistdel', function (id) {
+    emitter.on('apireqlistdel', function (id) {
         apiReqMap = _.filter(apiReqMap, function (item) {
             return item.id != id
         });
@@ -133,9 +133,9 @@ const getSetInfo = async () => {
     /**
      * 拦截url改变
      */
-    apiEmmiter.on('urlchange', function (url) {
+    emitter.on('urlchange', function (url) {
 
-        proxyUrl=url;
+        proxyUrl = url;
 
         apiMap = _.forEach(apiMap, (item) => {
             item.url = path.join(url, item.name)
@@ -148,7 +148,7 @@ const getSetInfo = async () => {
     /**
      * apistatus
      */
-    apiEmmiter.on('apistatus', function (req) {
+    emitter.on('apistatus', function (req) {
         if (req.list === "req") {
             apiReqMap = _.forEach(apiReqMap, (item) => {
                 if (item.id == req.id) {
@@ -286,8 +286,8 @@ const getSetInfo = async () => {
 async function openAnyProxy() {
     const options = await getSetInfo();
     const proxySvr = new AnyProxy.ProxyServer(options);
+
     proxySvr.on('ready', () => {
-        console.log("AnyProxy Server ready");
         if (options.throttle) {
             const rate = parseInt(options.throttle, 10);
             if (rate < 1) {
@@ -297,6 +297,7 @@ async function openAnyProxy() {
             logUtil.printLog(`限速 ${rate} kb/s`)
         }
     });
+
     proxySvr.start();
 }
 
