@@ -4,24 +4,29 @@
  * Date: 2017/3/23
  * Time: 下午6:28
  **/
+import _ from 'lodash';
+import path from 'path';
+import {ThrottleGroup} from 'stream-throttle'
+
 import setting from '../models/setting'
 import apiList from '../models/apiList'
 import apiReqList from '../models/apiReqList'
-import _ from 'lodash';
-import path from 'path';
-import emitter from './emitter';
+
 import AnyProxy from '../../proxy/proxy'
-import {ThrottleGroup} from 'stream-throttle'
 import logUtil from'../../proxy/lib/log'
+import emitter from './emitter';
 
 const getSetInfo = async () => {
 
     const proxySet = await setting.getProxy();
     const apiSet = await apiList.getApiList();
     const apiReqSet = await apiReqList.getReqApiList();
+
     let proxyUrl = proxySet.result.url; // 区分二级域名
 
     // --------------------------------------  事件监听  -------------------------------------- //
+    //todo:优化这里，看起来很蠢
+
     /**
      * 响应Api表
      */
@@ -36,6 +41,7 @@ const getSetInfo = async () => {
             "template": item.template
         }
     });
+
     /**
      * 请求Api表
      */
@@ -50,6 +56,7 @@ const getSetInfo = async () => {
             "name": item.name
         }
     });
+
     /**
      * 响应Api添加监听
      */
@@ -64,6 +71,7 @@ const getSetInfo = async () => {
             "template": result.template,
         });
     });
+
     /**
      * 响应Api编辑监听
      */
@@ -82,6 +90,7 @@ const getSetInfo = async () => {
             }
         });
     });
+
     /**
      * 响应Api删除监听
      */
@@ -90,6 +99,7 @@ const getSetInfo = async () => {
             return item.id != id
         });
     });
+
     /**
      * 请求Api添加监听
      */
@@ -104,6 +114,7 @@ const getSetInfo = async () => {
             "id": result._id
         });
     });
+
     /**
      * 请求Api编辑监听
      */
@@ -122,6 +133,7 @@ const getSetInfo = async () => {
             }
         });
     });
+
     /**
      * 请求Api删除监听
      */
@@ -130,6 +142,7 @@ const getSetInfo = async () => {
             return item.id != id
         });
     });
+
     /**
      * 拦截url改变
      */
@@ -145,6 +158,7 @@ const getSetInfo = async () => {
             item.url = path.join(url, item.name)
         });
     });
+
     /**
      * apistatus
      */

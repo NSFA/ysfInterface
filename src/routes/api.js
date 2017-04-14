@@ -5,28 +5,34 @@
  * Time: 下午4:49
  **/
 import Router from 'koa-router'
+import qrCode from 'qrcode-npm'
+import ip from 'ip'
+import fs from 'fs'
+import {ThrottleGroup} from 'stream-throttle'
+
 import User from '../models/user';
 import Setting from '../models/setting'
 import apiList from '../models/apiList'
 import apiReqList from '../models/apiReqList'
-import certMgr from'../../proxy/lib/certMgr'
-import util from'../../proxy/lib/util'
-import jsonCtx from './ctx';
-import emitter from '../proxy/emitter'
-import qrCode from 'qrcode-npm'
-import {ThrottleGroup} from 'stream-throttle'
-import logUtil from'../../proxy/lib/log'
-import ip from 'ip'
-import fs from 'fs'
+
 import nedb from '../models/nebd'
+
+import certMgr from'../../proxy/lib/certMgr'
+import logUtil from'../../proxy/lib/log'
+import util from'../../proxy/lib/util'
+import emitter from '../proxy/emitter'
+
+import jsonCtx from './ctx';
+
 const router = new Router();
 /**
  * 登录
  */
 router.post('/login', async (ctx, next) => {
-    const requestData = ctx.request.body;
-    const res = await User.getUser(requestData.account);
-    if (res && res.password === requestData.password) {
+    const req = ctx.request.body;
+    const res = await User.getUser(req.account);
+
+    if (res && res.password === req.password) {
         ctx.cookies.set(
             'login', true, {
                 maxAge: 60 * 60 * 1000 * 2, //两小时
@@ -51,21 +57,23 @@ router.get('/getProxy', async (ctx, next) => {
  * 设置AnyProxy
  */
 router.post('/setProxy', async (ctx, next) => {
-    const requestData = ctx.request.body;
-    const res = await Setting.setProxy(requestData);
-    emitter.emit('urlchange', requestData.url);
-    if (requestData.throttle) {
-        const rate = parseInt(requestData.throttle, 10);
+    const req = ctx.request.body;
+    const res = await Setting.setProxy(req);
+
+    emitter.emit('urlchange', req.url);
+
+    if (req.throttle) {
+        const rate = parseInt(req.throttle, 10);
         if (rate < 1) {
             throw new Error('Invalid throttle rate value, should be positive integer');
         }
         global._throttle = new ThrottleGroup({rate: 1024 * rate}); // rate - byte/sec
-
         logUtil.printLog(`限速 ${rate} kb/s`)
-    }else{
-        global._throttle = null; // rate - byte/sec
+    } else {
+        global._throttle = null; // null
         logUtil.printLog(`取消限速`)
     }
+
     ctx.body = res;
 });
 
@@ -80,15 +88,17 @@ router.get('/getApiList', async (ctx, next) => {
  * 添加API项
  */
 router.post('/addApi', async (ctx, next) => {
-    const requestData = ctx.request.body;
-    const res = await apiList.addApi(requestData);
+    const req = ctx.request.body;
+    const res = await apiList.addApi(req);
+
     if (res.code === 200) {
-        if (requestData.id === -1) {
+        if (req.id === -1) {
             emitter.emit('apilistadd', res.result);
         } else {
-            emitter.emit('apilistedit', requestData);
+            emitter.emit('apilistedit', req);
         }
     }
+
     ctx.body = res;
 });
 
@@ -96,9 +106,11 @@ router.post('/addApi', async (ctx, next) => {
  * 删除API项
  */
 router.post('/delApi', async (ctx, next) => {
-    const requestData = ctx.request.body;
-    const res = await apiList.delApi(requestData);
-    res.code === 200 && emitter.emit('apilistdel', requestData.id);
+    const req = ctx.request.body;
+    const res = await apiList.delApi(req);
+
+    res.code === 200 && emitter.emit('apilistdel', req.id);
+
     ctx.body = res;
 });
 
@@ -106,8 +118,8 @@ router.post('/delApi', async (ctx, next) => {
  * 获取API项
  */
 router.get('/getApi', async (ctx, next) => {
-    const requestData = ctx.request.query;
-    ctx.body = await apiList.getApi(requestData);
+    const req = ctx.request.query;
+    ctx.body = await apiList.getApi(req);
 });
 
 
@@ -122,15 +134,17 @@ router.get('/getReqApiList', async (ctx, next) => {
  * 添加API项
  */
 router.post('/addReqApi', async (ctx, next) => {
-    const requestData = ctx.request.body;
-    const res = await apiReqList.addReqApi(requestData);
+    const req = ctx.request.body;
+    const res = await apiReqList.addReqApi(req);
+
     if (res.code === 200) {
-        if (requestData.id === -1) {
+        if (req.id === -1) {
             emitter.emit('apireqlistadd', res.result);
         } else {
-            emitter.emit('apireqlistedit', requestData);
+            emitter.emit('apireqlistedit', req);
         }
     }
+
     ctx.body = res;
 });
 
@@ -138,9 +152,11 @@ router.post('/addReqApi', async (ctx, next) => {
  * 删除API项
  */
 router.post('/delReqApi', async (ctx, next) => {
-    const requestData = ctx.request.body;
-    const res = await apiReqList.delReqApi(requestData);
-    res.code === 200 && emitter.emit('apireqlistdel', requestData.id);
+    const req = ctx.request.body;
+    const res = await apiReqList.delReqApi(req);
+
+    res.code === 200 && emitter.emit('apireqlistdel', req.id);
+
     ctx.body = res;
 });
 
@@ -148,8 +164,9 @@ router.post('/delReqApi', async (ctx, next) => {
  * 获取API项
  */
 router.get('/getReqApi', async (ctx, next) => {
-    const requestData = ctx.request.query;
-    ctx.body = await apiReqList.getReqApi(requestData)
+    const req = ctx.request.query;
+
+    ctx.body = await apiReqList.getReqApi(req)
 });
 
 /**
@@ -158,14 +175,17 @@ router.get('/getReqApi', async (ctx, next) => {
 router.post('/setApiStatus', async (ctx, next) => {
     const req = ctx.request.body;
     let res;
+
     if (req.list === "req") {
         res = await apiReqList.updateStatus(req);
     } else {
         res = await apiList.updateStatus(req);
     }
+
     if (res.code === 200) {
         emitter.emit('apistatus', req);
     }
+
     ctx.body = res;
 });
 
