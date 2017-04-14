@@ -9,8 +9,7 @@ const http = require('http'),
     logUtil = require('./lib/log'),
     util = require('./lib/util'),
     events = require('events'),
-    wsServer = require('./lib/wsServer'),
-    ThrottleGroup = require('stream-throttle').ThrottleGroup;
+    wsServer = require('./lib/wsServer');
 
 const T_TYPE_HTTP = 'http',
     T_TYPE_HTTPS = 'https',
@@ -74,15 +73,6 @@ class ProxyCore extends events.EventEmitter {
 
         if (config.silent) {
             logUtil.setPrintStatus(false);
-        }
-
-        if (config.throttle) {
-            logUtil.printLog('throttle :' + config.throttle + 'kb/s');
-            const rate = parseInt(config.throttle, 10);
-            if (rate < 1) {
-                throw new Error('Invalid throttle rate value, should be positive integer');
-            }
-            global._throttle = new ThrottleGroup({rate: 1024 * rate}); // rate - byte/sec
         }
 
         // init recorder

@@ -11,6 +11,8 @@ import _ from 'lodash';
 import path from 'path';
 import apiEmmiter from './emmiter';
 import AnyProxy from '../../proxy/proxy'
+import {ThrottleGroup} from 'stream-throttle'
+import logUtil from'../../proxy/lib/log'
 
 const getSetInfo = async () => {
 
@@ -285,7 +287,15 @@ async function openAnyProxy() {
     const options = await getSetInfo();
     const proxySvr = new AnyProxy.ProxyServer(options);
     proxySvr.on('ready', () => {
-        console.log("AnyProxy Server ready")
+        console.log("AnyProxy Server ready");
+        if (options.throttle) {
+            const rate = parseInt(options.throttle, 10);
+            if (rate < 1) {
+                throw new Error('Invalid throttle rate value, should be positive integer');
+            }
+            global._throttle = new ThrottleGroup({rate: 1024 * rate}); // rate - byte/sec
+            logUtil.printLog(`限速 ${rate} kb/s`)
+        }
     });
     proxySvr.start();
 }

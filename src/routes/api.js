@@ -14,6 +14,8 @@ import util from'../../proxy/lib/util'
 import jsonCtx from './ctx';
 import apiEmmiter from '../proxy/emmiter'
 import qrCode from 'qrcode-npm'
+import {ThrottleGroup} from 'stream-throttle'
+import logUtil from'../../proxy/lib/log'
 import ip from 'ip'
 import fs from 'fs'
 import nedb from '../models/nebd'
@@ -52,6 +54,18 @@ router.post('/setProxy', async (ctx, next) => {
     const requestData = ctx.request.body;
     const res = await Setting.setProxy(requestData);
     apiEmmiter.emit('urlchange', requestData.url);
+    if (requestData.throttle) {
+        const rate = parseInt(requestData.throttle, 10);
+        if (rate < 1) {
+            throw new Error('Invalid throttle rate value, should be positive integer');
+        }
+        global._throttle = new ThrottleGroup({rate: 1024 * rate}); // rate - byte/sec
+
+        logUtil.printLog(`限速 ${rate} kb/s`)
+    }else{
+        global._throttle = null; // rate - byte/sec
+        logUtil.printLog(`取消限速`)
+    }
     ctx.body = res;
 });
 
@@ -213,6 +227,9 @@ router.get('/getReqBody', async (ctx, next) => {
 
 });
 
+/**
+ * 获取证书
+ */
 router.get('/fetchCrtFile', (ctx, next) => {
     const _crtFilePath = certMgr.getRootCAFilePath();
     if (_crtFilePath) {
@@ -225,6 +242,9 @@ router.get('/fetchCrtFile', (ctx, next) => {
     }
 });
 
+/**
+ * 获取证书信息及下载链接
+ */
 router.get('/getQrCode', async (ctx, next) => {
     const ipAddress = ip.address();
     const targetUrl = 'http://' + ipAddress + '/api/fetchCrtFile';
