@@ -17,6 +17,8 @@ const getSetInfo = async () => {
     const proxySet = await setting.getProxy();
     const apiSet = await apiList.getApiList();
     const apiReqSet = await apiReqList.getReqApiList();
+    let proxyUrl = proxySet.result.url; // 区分二级域名
+
     // --------------------------------------  事件监听  -------------------------------------- //
     /**
      * 响应Api表
@@ -130,7 +132,14 @@ const getSetInfo = async () => {
      * 拦截url改变
      */
     apiEmmiter.on('urlchange', function (url) {
+
+        proxyUrl=url;
+
         apiMap = _.forEach(apiMap, (item) => {
+            item.url = path.join(url, item.name)
+        });
+
+        apiReqMap = _.forEach(apiReqMap, (item) => {
             item.url = path.join(url, item.name)
         });
     });
@@ -159,7 +168,6 @@ const getSetInfo = async () => {
     const rule = {
         async beforeSendRequest(requestDetail) {
             const hostname = requestDetail.requestOptions.hostname;
-            const proxyUrl = proxySet.result.url; // 区分二级域名
             const path = requestDetail.requestOptions.path.split('?')[0];
             let reqData, reqType;
 
@@ -247,7 +255,6 @@ const getSetInfo = async () => {
             let newRes = responseDetail.response;
 
             const hostname = requestDetail.requestOptions.hostname;
-            const proxyUrl = proxySet.result.url; // 区分二级域名
             const path = requestDetail.requestOptions.path.split('?')[0];
 
             _.forEach(apiMap, function (item) {

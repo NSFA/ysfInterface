@@ -12,8 +12,10 @@ import apiReqList from '../models/apiReqList'
 import certMgr from'../../proxy/lib/certMgr'
 import util from'../../proxy/lib/util'
 import jsonCtx from './ctx';
-import apiEmmiter from '../proxy/emmiter';
-
+import apiEmmiter from '../proxy/emmiter'
+import qrCode from 'qrcode-npm'
+import ip from 'ip'
+import fs from 'fs'
 import nedb from '../models/nebd'
 const router = new Router();
 /**
@@ -49,7 +51,7 @@ router.get('/getProxy', async (ctx, next) => {
 router.post('/setProxy', async (ctx, next) => {
     const requestData = ctx.request.body;
     const res = await Setting.setProxy(requestData);
-    res.ok === 1 && apiEmmiter.emit('urlchange', requestData.url);
+    apiEmmiter.emit('urlchange', requestData.url);
     ctx.body = res;
 });
 
@@ -211,5 +213,33 @@ router.get('/getReqBody', async (ctx, next) => {
 
 });
 
+router.get('/fetchCrtFile', (ctx, next) => {
+    const _crtFilePath = certMgr.getRootCAFilePath();
+    if (_crtFilePath) {
+        ctx.set('Content-Type', 'application/x-x509-ca-cert');
+        ctx.set('Content-Disposition', 'attachment; filename="rootCA.crt"');
+        ctx.body = fs.readFileSync(_crtFilePath, {encoding: null});
+    } else {
+        ctx.set('Content-Type', 'text/html');
+        ctx.body = 'can not file rootCA ,plase use <strong>anyproxy --root</strong> to generate one';
+    }
+});
+
+router.get('/getQrCode', async (ctx, next) => {
+    const ipAddress = ip.address();
+    const targetUrl = 'http://' + ipAddress + '/api/fetchCrtFile';
+    const qr = qrCode.qrcode(4, 'M');
+    qr.addData(targetUrl);
+    qr.make();
+    const qrImageTag = qr.createImgTag(4);
+    const isRootCAFileExists = certMgr.isRootCAFileExists();
+
+    ctx.body = {
+        status: 'success',
+        url: targetUrl,
+        isRootCAFileExists,
+        qrImgDom: qrImageTag
+    };
+});
 
 export default router
