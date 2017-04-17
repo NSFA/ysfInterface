@@ -12,7 +12,7 @@ import {ThrottleGroup} from 'stream-throttle'
 
 import User from '../models/user';
 import Setting from '../models/setting'
-import apiList from '../models/apiList'
+import apiResList from '../models/apiResList'
 import apiReqList from '../models/apiReqList'
 
 import nedb from '../models/nebd'
@@ -78,7 +78,7 @@ router.post('/setProxy', async (ctx, next) => {
  * 获取API列表
  */
 router.get('/getApiList', async (ctx, next) => {
-    ctx.body = await apiList.getApiList();
+    ctx.body = await apiResList.getApiList();
 });
 
 /**
@@ -86,7 +86,7 @@ router.get('/getApiList', async (ctx, next) => {
  */
 router.post('/addApi', async (ctx, next) => {
     const req = ctx.request.body;
-    ctx.body = await apiList.addApi(req);
+    ctx.body = await apiResList.addApi(req);
 });
 
 /**
@@ -94,7 +94,7 @@ router.post('/addApi', async (ctx, next) => {
  */
 router.post('/delApi', async (ctx, next) => {
     const req = ctx.request.body;
-    ctx.body = await apiList.delApi(req);
+    ctx.body = await apiResList.delApi(req);
 });
 
 /**
@@ -102,7 +102,7 @@ router.post('/delApi', async (ctx, next) => {
  */
 router.get('/getApi', async (ctx, next) => {
     const req = ctx.request.query;
-    ctx.body = await apiList.getApi(req);
+    ctx.body = await apiResList.getApi(req);
 });
 
 
@@ -147,7 +147,7 @@ router.post('/setApiStatus', async (ctx, next) => {
     if (req.list === "req") {
         res = await apiReqList.updateStatus(req);
     } else {
-        res = await apiList.updateStatus(req);
+        res = await apiResList.updateStatus(req);
     }
 
     ctx.body = res;

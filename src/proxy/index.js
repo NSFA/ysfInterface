@@ -8,7 +8,7 @@ import _ from 'lodash';
 import {ThrottleGroup} from 'stream-throttle'
 
 import setting from '../models/setting'
-import apiList from '../models/apiList'
+import apiList from '../models/apiResList'
 import apiReqList from '../models/apiReqList'
 
 import AnyProxy from '../../proxy/proxy'
