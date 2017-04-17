@@ -1,5 +1,5 @@
 /**
- * AnyProxy设置表
+ * Proxy设置表
  * Created by qingze
  * Date: 2017/3/23
  * Time: 下午4:35

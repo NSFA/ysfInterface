@@ -222,7 +222,7 @@ router.get('/fetchCrtFile', (ctx, next) => {
         ctx.body = fs.readFileSync(_crtFilePath, {encoding: null});
     } else {
         ctx.set('Content-Type', 'text/html');
-        ctx.body = 'can not file rootCA ,plase use <strong>anyproxy --root</strong> to generate one';
+        ctx.body = 'can not file rootCA,please retry';
     }
 });
 

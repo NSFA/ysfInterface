@@ -1,5 +1,5 @@
 /**
- * API列表
+ * API响应列表
  * Created by qingze
  * Date: 2017/3/24
  * Time: 下午1:49

@@ -1,5 +1,5 @@
 /**
- * Created by qingze
+ * 拦截列表类
  * User: qingze
  * Date: 2017/4/14
  * Time: 下午5:36

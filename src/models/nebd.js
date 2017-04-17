@@ -35,6 +35,7 @@ const getLogBody = ((id) => {
         });
     });
 });
+
 export default {
     latestLog,getLogBody
 }
