@@ -5,7 +5,6 @@
  * Time: 下午6:28
  **/
 import _ from 'lodash';
-import path from 'path';
 import {ThrottleGroup} from 'stream-throttle'
 
 import setting from '../models/setting'
@@ -14,7 +13,8 @@ import apiReqList from '../models/apiReqList'
 
 import AnyProxy from '../../proxy/proxy'
 import logUtil from'../../proxy/lib/log'
-import emitter from './emitter';
+
+import apiMaps from './maps'
 
 const getSetInfo = async () => {
 
@@ -25,158 +25,26 @@ const getSetInfo = async () => {
     let proxyUrl = proxySet.result.url; // 区分二级域名
 
     // --------------------------------------  事件监听  -------------------------------------- //
-    //todo:优化这里，看起来很蠢
 
-    /**
-     * 响应Api表
-     */
-    let apiMap = _.map(apiSet.result, (item) => {
-        return {
-            "url": path.join(proxySet.result.url, item.name),
-            "jsonArr": item.jsonArr,
-            "status": item.status,
-            "statusCode": item.statusCode,
-            "id": item._id,
-            "name": item.name,
-            "template": item.template
-        }
+    //响应拦截表
+    global.resMaps = new apiMaps({
+        url: proxyUrl,
+        map: apiSet.result,
+        listType:"响应拦截"
     });
 
-    /**
-     * 请求Api表
-     */
-    let apiReqMap = _.map(apiReqSet.result, (item) => {
-        return {
-            "url": path.join(proxySet.result.url, item.name),
-            "reqArr": item.reqArr,
-            "template": item.template,
-            "status": item.status,
-            "id": item._id,
-            "type": item.type,
-            "name": item.name
-        }
+    //请求拦截表
+    global.reqMaps = new apiMaps({
+        url: proxyUrl,
+        map: apiReqSet.result,
+        listType:'请求拦截'
     });
 
-    /**
-     * 响应Api添加监听
-     */
-    emitter.on('apilistadd', function (result) {
-        apiMap.push({
-            "url": path.join(proxySet.result.url, result.name),
-            "jsonArr": result.jsonArr,
-            "status": result.status,
-            "statusCode": result.statusCode,
-            "id": result._id,
-            "name": result.name,
-            "template": result.template,
-        });
-    });
-
-    /**
-     * 响应Api编辑监听
-     */
-    emitter.on('apilistedit', function (result) {
-        apiMap = _.forEach(apiMap, function (item) {
-            if (item.id == result.id) {
-                _.extend(item, {
-                    "url": path.join(proxySet.result.url, result.name),
-                    "jsonArr": result.jsonArr,
-                    "status": result.status,
-                    "statusCode": result.statusCode,
-                    "template": result.template,
-                    "name": result.name
-                });
-                return false;
-            }
-        });
-    });
-
-    /**
-     * 响应Api删除监听
-     */
-    emitter.on('apilistdel', function (id) {
-        apiMap = _.filter(apiMap, function (item) {
-            return item.id != id
-        });
-    });
-
-    /**
-     * 请求Api添加监听
-     */
-    emitter.on('apireqlistadd', function (result) {
-        apiReqMap.push({
-            "url": path.join(proxySet.result.url, result.name),
-            "reqArr": result.reqArr,
-            "template": result.template,
-            "status": result.status,
-            "name": result.name,
-            "type": result.type,
-            "id": result._id
-        });
-    });
-
-    /**
-     * 请求Api编辑监听
-     */
-    emitter.on('apireqlistedit', function (result) {
-        apiReqMap = _.forEach(apiReqMap, function (item) {
-            if (item.id == result.id) {
-                _.extend(item, {
-                    "url": path.join(proxySet.result.url, result.name),
-                    "reqArr": result.reqArr,
-                    "template": result.template,
-                    "status": result.status,
-                    "name": result.name,
-                    "type": result.type
-                });
-                return false;
-            }
-        });
-    });
-
-    /**
-     * 请求Api删除监听
-     */
-    emitter.on('apireqlistdel', function (id) {
-        apiReqMap = _.filter(apiReqMap, function (item) {
-            return item.id != id
-        });
-    });
-
-    /**
-     * 拦截url改变
-     */
-    emitter.on('urlchange', function (url) {
-
-        proxyUrl = url;
-
-        apiMap = _.forEach(apiMap, (item) => {
-            item.url = path.join(url, item.name)
-        });
-
-        apiReqMap = _.forEach(apiReqMap, (item) => {
-            item.url = path.join(url, item.name)
-        });
-    });
-
-    /**
-     * apistatus
-     */
-    emitter.on('apistatus', function (req) {
-        if (req.list === "req") {
-            apiReqMap = _.forEach(apiReqMap, (item) => {
-                if (item.id == req.id) {
-                    item.status = req.status;
-                    return !1;
-                }
-            });
-        } else {
-            apiMap = _.forEach(apiMap, (item) => {
-                if (item.id == req.id) {
-                    item.status = req.status;
-                    return !1;
-                }
-            });
+    //监听一个url改变
+    global.resMaps.on('proxyUrl', function (url) {
+        if (proxyUrl !== url) {
+            proxyUrl = url;
+            logUtil.printLog('Proxy : 拦截url改变 ')
         }
     });
 
@@ -187,7 +55,9 @@ const getSetInfo = async () => {
             const path = requestDetail.requestOptions.path.split('?')[0];
             let reqData, reqType;
 
-            _.forEach(apiReqMap, function (item) {
+            let reqMaps = global.reqMaps.getMaps();
+
+            _.forEach(reqMaps, function (item) {
                 if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
                     reqData = item.reqArr[item.template].reqData;
                     reqType = item.reqArr[item.template].type;
@@ -273,7 +143,9 @@ const getSetInfo = async () => {
             const hostname = requestDetail.requestOptions.hostname;
             const path = requestDetail.requestOptions.path.split('?')[0];
 
-            _.forEach(apiMap, function (item) {
+            let resMaps = global.resMaps.getMaps();
+
+            _.forEach(resMaps, function (item) {
                 if (hostname.indexOf(proxyUrl) > -1 && item.status && path.indexOf(item.name) > -1) {
                     newRes.header['X-Proxy-By'] = 'YSF-MOCK';
                     newRes.body = JSON.stringify(item.jsonArr[item.template]);

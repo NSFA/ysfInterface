@@ -6,17 +6,19 @@
  **/
 
 import mongoose from 'mongoose';
+import logUtil from'../../proxy/lib/log'
 
 mongoose.Promise = global.Promise;
 
 let db = mongoose.connection;
+
 db.once('open', () => {
-    console.log("database connected")
+    logUtil.printLog("Mongodb database connected");
 });
 
 mongoose.connect('mongodb://59.111.99.122:27017/ysf', function (err) {
     if (err) {
-        console.error('connect to %s error: ', 'ysf', err.message);
+        logUtil.printLog(`connect to ysf error: ${err.message}`,logUtil.T_ERR);
         process.exit(1);
     }
 });

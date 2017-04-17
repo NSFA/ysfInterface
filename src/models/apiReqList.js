@@ -1,7 +1,6 @@
 /**
  * API列表
  * Created by qingze
- * User: hzqingze
  * Date: 2017/3/24
  * Time: 下午1:49
  **/
@@ -44,6 +43,10 @@ const getReqApiList = () => {
 const delReqApi = (api) => {
     return new Promise((resolve, reject) => {
         ApiReqList.remove({_id: api.id}).then((result) => {
+
+            //删除api
+            global.reqMaps.itemDel(api.id);
+
             resolve({
                 code: 200,
                 msg: '删除Api成功',
@@ -94,6 +97,10 @@ const addReqApi = (api) => {
                 } else {
                     api.update = new Date();
                     ApiReqList.create(api).then((result) => {
+
+                        //添加api
+                        global.reqMaps.itemAdd(result);
+
                         resolve({
                             result: result,
                             code: 200,
@@ -106,6 +113,10 @@ const addReqApi = (api) => {
             //编辑
             api.update = new Date();
             ApiReqList.updateOne({_id: api.id}, api).then((result) => {
+
+                //编辑api
+                global.reqMaps.itemEdit(api.id,api);
+
                 resolve({
                     result: result,
                     code: 200,
@@ -130,6 +141,10 @@ const updateStatus = (req) => {
                     result: err
                 })
             }
+
+            //api状态改变
+            global.reqMaps.itemStatusChange(req.status,req.id);
+
             resolve({
                 result: "",
                 code: 200,

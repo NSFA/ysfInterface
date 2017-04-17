@@ -20,7 +20,6 @@ import nedb from '../models/nebd'
 import certMgr from'../../proxy/lib/certMgr'
 import logUtil from'../../proxy/lib/log'
 import util from'../../proxy/lib/util'
-import emitter from '../proxy/emitter'
 
 import jsonCtx from './ctx';
 
@@ -60,8 +59,6 @@ router.post('/setProxy', async (ctx, next) => {
     const req = ctx.request.body;
     const res = await Setting.setProxy(req);
 
-    emitter.emit('urlchange', req.url);
-
     if (req.throttle) {
         const rate = parseInt(req.throttle, 10);
         if (rate < 1) {
@@ -89,17 +86,7 @@ router.get('/getApiList', async (ctx, next) => {
  */
 router.post('/addApi', async (ctx, next) => {
     const req = ctx.request.body;
-    const res = await apiList.addApi(req);
-
-    if (res.code === 200) {
-        if (req.id === -1) {
-            emitter.emit('apilistadd', res.result);
-        } else {
-            emitter.emit('apilistedit', req);
-        }
-    }
-
-    ctx.body = res;
+    ctx.body = await apiList.addApi(req);
 });
 
 /**
@@ -107,11 +94,7 @@ router.post('/addApi', async (ctx, next) => {
  */
 router.post('/delApi', async (ctx, next) => {
     const req = ctx.request.body;
-    const res = await apiList.delApi(req);
-
-    res.code === 200 && emitter.emit('apilistdel', req.id);
-
-    ctx.body = res;
+    ctx.body = await apiList.delApi(req);
 });
 
 /**
@@ -135,17 +118,7 @@ router.get('/getReqApiList', async (ctx, next) => {
  */
 router.post('/addReqApi', async (ctx, next) => {
     const req = ctx.request.body;
-    const res = await apiReqList.addReqApi(req);
-
-    if (res.code === 200) {
-        if (req.id === -1) {
-            emitter.emit('apireqlistadd', res.result);
-        } else {
-            emitter.emit('apireqlistedit', req);
-        }
-    }
-
-    ctx.body = res;
+    ctx.body = await apiReqList.addReqApi(req);
 });
 
 /**
@@ -153,11 +126,7 @@ router.post('/addReqApi', async (ctx, next) => {
  */
 router.post('/delReqApi', async (ctx, next) => {
     const req = ctx.request.body;
-    const res = await apiReqList.delReqApi(req);
-
-    res.code === 200 && emitter.emit('apireqlistdel', req.id);
-
-    ctx.body = res;
+    ctx.body = await apiReqList.delReqApi(req);
 });
 
 /**
@@ -165,7 +134,6 @@ router.post('/delReqApi', async (ctx, next) => {
  */
 router.get('/getReqApi', async (ctx, next) => {
     const req = ctx.request.query;
-
     ctx.body = await apiReqList.getReqApi(req)
 });
 
@@ -180,10 +148,6 @@ router.post('/setApiStatus', async (ctx, next) => {
         res = await apiReqList.updateStatus(req);
     } else {
         res = await apiList.updateStatus(req);
-    }
-
-    if (res.code === 200) {
-        emitter.emit('apistatus', req);
     }
 
     ctx.body = res;

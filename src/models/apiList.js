@@ -44,6 +44,10 @@ const getApiList = () => {
 const delApi = (api) => {
     return new Promise((resolve, reject) => {
         ApiList.remove({_id: api.id}).then((result) => {
+
+            //删除api
+            global.resMaps.itemDel(api.id);
+
             resolve({
                 code: 200,
                 msg: '删除Api成功',
@@ -94,6 +98,10 @@ const addApi = (api) => {
                 } else {
                     api.update = new Date();
                     ApiList.create(api).then((result) => {
+
+                        //添加api
+                        global.resMaps.itemAdd(result);
+
                         resolve({
                             result: result,
                             code: 200,
@@ -106,6 +114,10 @@ const addApi = (api) => {
             //编辑Api
             api.update = new Date();
             ApiList.updateOne({_id: api.id}, api).then((result) => {
+
+                //编辑api
+                global.resMaps.itemEdit(api.id,api);
+
                 resolve({
                     result: result,
                     code: 200,
@@ -130,6 +142,10 @@ const updateStatus = (req) => {
                     result: err
                 })
             }
+
+            //api状态更新
+            global.resMaps.itemStatusChange(req.status,req.id);
+
             resolve({
                 result: "",
                 code: 200,

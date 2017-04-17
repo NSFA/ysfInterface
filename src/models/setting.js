@@ -1,7 +1,6 @@
 /**
  * AnyProxy设置表
  * Created by qingze
- * User: hzqingze
  * Date: 2017/3/23
  * Time: 下午4:35
  **/
@@ -43,6 +42,11 @@ const setProxy = (list) => {
         const id = list._id;
         delete list._id;
         Setting.updateOne({_id: id}, list).then((result) => {
+
+            //拦截url改变
+            global.reqMaps.urlChange(list.url);
+            global.resMaps.urlChange(list.url);
+
             resolve({
                 "result": result,
                 "code": result.ok === 1 ? 200 : 500,
