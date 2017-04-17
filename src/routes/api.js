@@ -144,10 +144,17 @@ router.post('/setApiStatus', async (ctx, next) => {
     const req = ctx.request.body;
     let res;
 
-    if (req.list === "req") {
-        res = await apiReqList.updateStatus(req);
-    } else {
-        res = await apiResList.updateStatus(req);
+    switch(req.list){
+        case "req":
+            res = await apiReqList.updateStatus(req);
+            break;
+        case "res":
+            res = await apiResList.updateStatus(req);
+            break;
+        default:
+            res={};
+            logUtil.printLog('未存在当前类型',logUtil.T_ERR);
+            break;
     }
 
     ctx.body = res;
