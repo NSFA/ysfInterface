@@ -33,7 +33,7 @@ class ProxyCore extends events.EventEmitter {
      * @param {number} config.port - port of the proxy server
      * @param {object} [config.rule=null] - rule module to use
      * @param {string} [config.type=http] - type of the proxy server, could be 'http' or 'https'
-     * @param {strign} [config.hostname=localhost] - host name of the proxy server, required when this is an https proxy
+     * @param {string} [config.hostname=localhost] - host name of the proxy server, required when this is an https proxy
      * @param {number} [config.throttle] - speed limit in kb/s
      * @param {boolean} [config.forceProxyHttps=false] - if proxy all https requests
      * @param {boolean} [config.silent=false] - if keep the console silent
@@ -189,7 +189,7 @@ class ProxyServer extends ProxyCore {
     constructor(config) {
         // prepare a recorder
         global.recorder = new Recorder();
-        const recorder =global.recorder;
+        const recorder = global.recorder;
         const configForCore = Object.assign({
             recorder,
         }, config);

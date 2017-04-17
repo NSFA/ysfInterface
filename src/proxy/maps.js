@@ -14,6 +14,7 @@ class maps extends events.EventEmitter {
 
     constructor(config) {
         super();
+        config = config || {};
 
         this.map = config.map;
         this.url = config.url;
