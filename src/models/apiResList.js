@@ -116,7 +116,7 @@ const addApi = (api) => {
             ApiList.updateOne({_id: api.id}, api).then((result) => {
 
                 //编辑api
-                global.resMaps.itemEdit(api.id,api);
+                global.resMaps.itemEdit(api.id, api);
 
                 resolve({
                     result: result,
@@ -144,7 +144,7 @@ const updateStatus = (req) => {
             }
 
             //api状态更新
-            global.resMaps.itemStatusChange(req.status,req.id);
+            global.resMaps.itemStatusChange(req.status, req.id);
 
             resolve({
                 result: "",

@@ -30,14 +30,14 @@ const getSetInfo = async () => {
     global.resMaps = new apiMaps({
         url: proxyUrl,
         map: apiSet.result,
-        listType:"响应拦截"
+        listType: "响应拦截"
     });
 
     //请求拦截表
     global.reqMaps = new apiMaps({
         url: proxyUrl,
         map: apiReqSet.result,
-        listType:'请求拦截'
+        listType: '请求拦截'
     });
 
     //监听一个url改变
