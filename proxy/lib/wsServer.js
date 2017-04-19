@@ -13,6 +13,15 @@ function resToMsg(msg, recorder, cb) {
   let result = {},
     jsonData;
 
+  if(typeof msg === 'string'){
+      result = {
+          type: 'heartbeat',
+          message: 'received heartbeat '
+      };
+      cb && cb(result);
+      return;
+  }
+
   try {
     jsonData = JSON.parse(msg);
   } catch (e) {
