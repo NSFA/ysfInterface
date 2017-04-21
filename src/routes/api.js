@@ -25,7 +25,7 @@ import jsonCtx from './ctx';
 
 const router = new Router();
 /**
- * 登录
+ * 登录(简陋)
  */
 router.post('/login', async (ctx, next) => {
     const req = ctx.request.body;

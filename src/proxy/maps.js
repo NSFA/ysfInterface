@@ -35,7 +35,7 @@ class maps extends events.EventEmitter {
             item.url = path.join(url, item.name)
         });
 
-        logUtil.printLog(`${this.listType} Maps: 拦截url初始化`)
+        logUtil.printLog(`${this.listType} : url初始化`)
 
     }
 
@@ -52,7 +52,7 @@ class maps extends events.EventEmitter {
 
         this.emit('proxyUrl', url);
 
-        logUtil.printLog(`${this.listType} Maps: 拦截url改变-${url}`)
+        logUtil.printLog(`${this.listType} : 拦截url改变-${url}`)
     }
 
     /**
@@ -64,7 +64,7 @@ class maps extends events.EventEmitter {
 
         this.map.push(ListItem);
 
-        logUtil.printLog(`${this.listType} Maps: 拦截项-${ListItem.name}-增加成功`)
+        logUtil.printLog(`${this.listType} : 拦截项-${ListItem.name}-增加成功`)
 
     }
 
@@ -75,7 +75,7 @@ class maps extends events.EventEmitter {
     itemDel(ListItemId) {
         this.map = _.reject(this.map, {id: ListItemId});
 
-        logUtil.printLog(`${this.listType} Maps: 拦截项-${ListItemId}-删除成功`)
+        logUtil.printLog(`${this.listType} : 拦截项-${ListItemId}-删除成功`)
     }
 
     /**
@@ -91,7 +91,7 @@ class maps extends events.EventEmitter {
             }
         });
 
-        logUtil.printLog(`${this.listType} Maps: 拦截项-${ListItemId}-编辑成功`)
+        logUtil.printLog(`${this.listType} : 拦截项-${ListItemId}-编辑成功`)
     }
 
     /**
@@ -107,7 +107,7 @@ class maps extends events.EventEmitter {
             }
         });
 
-        logUtil.printLog(`${this.listType} Maps: 拦截开关-${ListItemStatus?"开启":"关闭"}成功`)
+        logUtil.printLog(`${this.listType} : 拦截开关-${ListItemStatus?"开启":"关闭"}成功`)
 
     }
 

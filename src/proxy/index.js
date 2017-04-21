@@ -1,5 +1,5 @@
 /**
- * AnyProxy
+ * Proxy
  * Created by qingze
  * Date: 2017/3/23
  * Time: 下午6:28
@@ -11,7 +11,7 @@ import setting from '../models/setting'
 import apiList from '../models/apiResList'
 import apiReqList from '../models/apiReqList'
 
-import AnyProxy from '../../proxy/proxy'
+import Proxy from '../../proxy/proxy'
 import logUtil from'../../proxy/lib/log'
 
 import apiMaps from './maps'
@@ -169,9 +169,9 @@ const getSetInfo = async () => {
 };
 
 // --------------------------------------  开启代理服务  -------------------------------------- //
-async function openAnyProxy() {
+async function openProxy() {
     const options = await getSetInfo();
-    const proxySvr = new AnyProxy.ProxyServer(options);
+    const proxySvr = new Proxy.ProxyServer(options);
 
     proxySvr.on('ready', () => {
         if (options.throttle) {
@@ -188,5 +188,5 @@ async function openAnyProxy() {
 }
 
 export default {
-    openAnyProxy
+    openProxy
 }

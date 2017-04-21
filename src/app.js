@@ -1,6 +1,7 @@
 import http from 'http'
-import Koa from 'koa'
 import path from 'path'
+
+import Koa from 'koa'
 import views from 'koa-views'
 import convert from 'koa-convert'
 import json from 'koa-json'
@@ -8,11 +9,16 @@ import Bodyparser from 'koa-bodyparser'
 import logger from 'koa-logger'
 import koaStatic from 'koa-static-plus'
 import koaOnError from 'koa-onerror'
+
+import color from 'colorful'
+
 import config from './config'
-import anyproxy from './proxy'
+import proxy from './proxy'
 
 import logUtil from '../proxy/lib/log'
+
 const app = new Koa();
+
 const bodyparser = Bodyparser();
 
 // middlewares
@@ -59,6 +65,7 @@ app.on('error', async (err, ctx) => {
     logUtil.printLog('error occured:', logUtil.T_ERR)
 });
 
+//listen
 const port = parseInt(config.port || '3000');
 const server = http.createServer(app.callback());
 
@@ -70,11 +77,11 @@ server.on('error', (error) => {
     }
     switch (error.code) {
         case 'EACCES':
-            console.error(port + ' requires elevated privileges');
+            logUtil.printLog(port + ' requires elevated privileges',logUtil.T_ERR);
             process.exit(1);
             break;
         case 'EADDRINUSE':
-            console.error(port + ' is already in use');
+            logUtil.printLog(port + ' is already in use',logUtil.T_ERR);
             process.exit(1);
             break;
         default:
@@ -83,10 +90,12 @@ server.on('error', (error) => {
 });
 
 server.on('listening', () => {
-    console.log('Listening on port: %d', port)
+    logUtil.printLog('Listening on port: %d', port)
 });
 
 //open proxy
-anyproxy.openAnyProxy();
+proxy.openProxy().then(()=>{
+    logUtil.printLog(color.yellow(`proxyServer all started at ${config.port} - ${new Date()}`))
+});
 
 export default app
